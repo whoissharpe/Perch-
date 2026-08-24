@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Perch — iPhone preview</title>
+<style>
+  :root {
+    --bg: #0b120f;
+    --panel: #16211d;
+    --line: rgba(237,242,239,.14);
+    --ink: #edf2ef;
+    --muted: #8b9a93;
+    --pine: #8fbba6;
+    --blaze: #f2814f;
+  }
+  * { box-sizing: border-box; margin: 0; }
+  body {
+    background:
+      radial-gradient(1000px 600px at 50% -10%, #16241d, transparent 70%),
+      var(--bg);
+    color: var(--ink);
+    font: 15px/1.5 ui-sans-serif, system-ui, sans-serif;
+    min-height: 100vh;
+    display: grid;
+    place-items: start center;
+    padding: 40px 20px 64px;
+    gap: 26px;
+  }
+  header { text-align: center; display: grid; gap: 8px; }
+  h1 { font-size: 21px; font-weight: 600; letter-spacing: -.02em; }
+  p.sub { color: var(--muted); font-size: 13.5px; max-width: 52ch; }
+
+  .stage { display: flex; gap: 34px; align-items: flex-start; flex-wrap: wrap; justify-content: center; }
+
+  /* iPhone 14 Pro-ish shell: 390x844 logical */
+  .phone {
+    position: relative;
+    width: 414px;
+    height: 868px;
+    border-radius: 58px;
+    padding: 12px;
+    background: linear-gradient(160deg, #33403a, #101714 60%);
+    box-shadow:
+      0 1px 1px rgba(255,255,255,.22) inset,
+      0 40px 90px rgba(0,0,0,.55),
+      0 8px 24px rgba(0,0,0,.4);
+    flex: none;
+  }
+  .screen {
+    position: relative;
+    width: 390px;
+    height: 844px;
+    border-radius: 46px;
+    overflow: hidden;
+    background: #0e1613;
+  }
+  .screen iframe { width: 390px; height: 844px; border: 0; display: block; }
+  .notch {
+    position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+    width: 112px; height: 30px; border-radius: 999px; background: #0a0f0d;
+    z-index: 5; pointer-events: none;
+  }
+
+  aside { max-width: 320px; display: grid; gap: 18px; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
+  .card h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
+  ol, ul { margin: 0; padding-left: 18px; display: grid; gap: 9px; font-size: 13.5px; color: #cfdad4; }
+  li b { color: var(--ink); font-weight: 600; }
+  .k { color: var(--pine); font-weight: 600; }
+  .b { color: var(--blaze); font-weight: 600; }
+  .row { display: flex; gap: 8px; flex-wrap: wrap; }
+  button {
+    font: inherit; font-size: 13px; color: var(--ink); cursor: pointer;
+    background: transparent; border: 1px solid var(--line);
+    border-radius: 999px; padding: 8px 14px;
+  }
+  button:hover { border-color: var(--pine); }
+  button.on { background: var(--pine); border-color: var(--pine); color: #0e1613; font-weight: 600; }
+  .note { font-size: 12.5px; color: var(--muted); }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Perch — iPhone preview</h1>
+  <p class="sub">
+    The real app running at iPhone size (390&nbsp;&times;&nbsp;844). Everything is
+    live: pan and zoom the map, tap the birds, switch tabs.
+  </p>
+</header>
+
+<div class="stage">
+  <div class="phone">
+    <div class="notch"></div>
+    <div class="screen">
+      <iframe id="app" src="/" title="Perch app"></iframe>
+    </div>
+  </div>
+
+  <aside>
+    <div class="card">
+      <h2>Things to try</h2>
+      <ol>
+        <li><b>Zoom in past street level.</b> Each bird <span class="k">swoops, beats its wings twice and lands</span> on a bench. Zoom back out and the bench goes.</li>
+        <li><b>Tap a bird.</b> It turns to face you with <span class="k">wings spread</span> and its post opens below.</li>
+        <li><b>Tap it again</b> to fold its wings and put it back on the bench.</li>
+        <li><b>Hollow rings</b> are spots seeded from OpenStreetMap that nobody has photographed yet.</li>
+        <li><b>The <span class="b">orange +</span></b> is the capture flow — it asks you to sign in first.</li>
+      </ol>
+    </div>
+
+    <div class="card">
+      <h2>Jump the map</h2>
+      <div class="row">
+        <button data-z="13">Zoomed out</button>
+        <button data-z="16.6">Street level</button>
+        <button data-z="18">Close in</button>
+      </div>
+      <p class="note" style="margin-top:12px">
+        The landing only plays when the zoom crosses 15.5 — that is the point
+        where a bench is legible.
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Note</h2>
+      <p class="note">
+        This is the web build of the same React Native code, so the map is
+        MapLibre rather than the native map. On a device it is Apple/Google
+        Maps with the same pine styling. Location shows as
+        <b>LOCATION&nbsp;OFF</b> unless you allow it in the browser.
+      </p>
+    </div>
+  </aside>
+</div>
+
+<script>
+  // Drive the embedded app's map from the buttons.
+  document.querySelectorAll("button[data-z]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("button[data-z]").forEach((b) => b.classList.remove("on"));
+      btn.classList.add("on");
+      const win = document.getElementById("app").contentWindow;
+      const map = win && win.__perchMap;
+      if (!map) return;
+      map.easeTo({ center: [-9.1421, 38.7191], zoom: Number(btn.dataset.z), duration: 1200 });
+    });
+  });
+</script>
+</body>
+</html>

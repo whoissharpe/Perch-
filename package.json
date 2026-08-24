@@ -17,7 +17,8 @@
     "lint": "npm run lint --workspaces --if-present",
     "seed:osm": "tsx scripts/seed-osm.ts",
     "icons": "node scripts/make-icons.mjs",
-    "db:push": "supabase db push"
+    "db:push": "supabase db push",
+    "mobile:web": "npm run export:web --workspace @perch/mobile"
   },
   "devDependencies": {
     "sharp": "^0.33.5",
