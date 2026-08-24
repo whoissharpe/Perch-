@@ -83,34 +83,37 @@ export function BirdPin({
 
   const size = 76;
 
-  // Selected: wings wide and larger. It is the tell that this is the bird
-  // whose post is open below, and it reads from across the map.
-  const shownPose = selected ? "spread" : pose;
-
   return (
     <View
       style={[
         styles.wrap,
-        { width: size, height: size, transform: [{ scale: selected ? 1.55 : 1 }] },
+        { width: size, height: size, transform: [{ scale: selected ? 1.5 : 1 }] },
       ]}
     >
+      {/* the flying / standing bird */}
       <Animated.View
         style={[
           StyleSheet.absoluteFill,
           {
-            opacity: selected ? 1 : birdOut,
+            opacity: selected ? 0 : birdOut,
             transform: [{ translateY: lift }],
           },
         ]}
       >
-        <Image source={BIRD[tint][shownPose]} style={styles.img} contentFit="contain" />
+        <Image source={BIRD[tint][pose]} style={styles.img} contentFit="contain" />
       </Animated.View>
 
+      {/* settled on the bench, wings closed */}
       <Animated.View
         style={[StyleSheet.absoluteFill, { opacity: selected ? 0 : benchIn }]}
       >
         <Image source={BIRD[tint].mark} style={styles.img} contentFit="contain" />
       </Animated.View>
+
+      {/* open: turned to face you, wings spread, while its post is showing */}
+      <View style={[StyleSheet.absoluteFill, { opacity: selected ? 1 : 0 }]}>
+        <Image source={BIRD[tint].open} style={styles.img} contentFit="contain" />
+      </View>
     </View>
   );
 }

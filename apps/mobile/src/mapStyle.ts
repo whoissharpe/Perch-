@@ -27,17 +27,19 @@ export const MAP_STYLE_LIGHT: MapStyle = [
 ];
 
 export const MAP_STYLE_DARK: MapStyle = [
-  { elementType: "geometry", stylers: [{ color: "#16211d" }] },
+  // Deep pine rather than black — every surface keeps a green cast so the
+  // basemap belongs to the brand instead of just being dark.
+  { elementType: "geometry", stylers: [{ color: "#0f1f19" }] },
   { elementType: "labels.icon", stylers: [{ visibility: "off" }] },
-  { elementType: "labels.text.fill", stylers: [{ color: "#7e8c86" }] },
-  { elementType: "labels.text.stroke", stylers: [{ color: "#0e1613" }] },
+  { elementType: "labels.text.fill", stylers: [{ color: "#6f8279" }] },
+  { elementType: "labels.text.stroke", stylers: [{ color: "#0a1712" }] },
   { featureType: "administrative", elementType: "geometry", stylers: [{ visibility: "off" }] },
   { featureType: "poi", stylers: [{ visibility: "off" }] },
-  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#1b2c25" }, { visibility: "on" }] },
-  { featureType: "road", elementType: "geometry", stylers: [{ color: "#1e2b26" }] },
+  { featureType: "poi.park", elementType: "geometry", stylers: [{ color: "#163025" }, { visibility: "on" }] },
+  { featureType: "road", elementType: "geometry", stylers: [{ color: "#193028" }] },
   { featureType: "road", elementType: "labels", stylers: [{ visibility: "off" }] },
-  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#25342d" }] },
+  { featureType: "road.highway", elementType: "geometry", stylers: [{ color: "#1f3a30" }] },
   { featureType: "transit", stylers: [{ visibility: "off" }] },
-  { featureType: "water", elementType: "geometry", stylers: [{ color: "#0b1512" }] },
+  { featureType: "water", elementType: "geometry", stylers: [{ color: "#08150f" }] },
   { featureType: "water", elementType: "labels.text", stylers: [{ visibility: "off" }] },
 ];

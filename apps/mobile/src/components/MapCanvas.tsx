@@ -75,7 +75,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
           <Marker
             key={m.id}
             coordinate={{ latitude: m.lat, longitude: m.lng }}
-            onPress={() => onSelect(m.id)}
+            onPress={() => onSelect(selectedId === m.id ? null : m.id)}
             // The bird animates, so this marker has to keep redrawing.
             tracksViewChanges={marked}
             anchor={{ x: 0.5, y: marked ? 1 : 0.5 }}

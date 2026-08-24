@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KIND_LABELS, type SpotKind } from "@perch/core";
 import { useTheme, type, radius, space } from "@/theme";
@@ -8,6 +7,7 @@ import { SAMPLE_MARKS } from "@/sample";
 import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
 import { Icon } from "@/components/Icon";
+import { Mark } from "@/components/Mark";
 import { useLiveLocation } from "@/useLiveLocation";
 
 const FILTERS: (SpotKind | "all")[] = ["all", "bench", "viewpoint", "trail_rest"];
@@ -44,11 +44,7 @@ export default function MapScreen() {
       <View style={[styles.top, { top: insets.top + 8 }]}>
         <View style={styles.brandRow}>
           <View style={[styles.brand, { backgroundColor: c.surface, borderColor: c.line }]}>
-            <Image
-              source={require("../../assets/icon.png")}
-              style={styles.brandMark}
-              contentFit="contain"
-            />
+            <Mark size={26} />
             <Text style={[type.cardTitle, { color: c.ink }]}>Perch</Text>
           </View>
 
@@ -94,26 +90,21 @@ export default function MapScreen() {
             );
           })}
         </ScrollView>
-      </View>
 
-      {/* count / location state */}
-      <View
-        style={[
-          styles.hud,
-          {
-            backgroundColor: c.surface,
-            borderColor: c.line,
-            bottom: active ? 320 : 24,
-          },
-        ]}
-      >
-        <Text style={[type.meta, { color: c.muted }]}>
-          {permission === "denied"
-            ? "LOCATION OFF"
-            : follow && location
-              ? "FOLLOWING YOUR WALK"
-              : `${visible.length} SPOTS · ${visible.filter((m) => m.marks > 0).length} MARKED`}
-        </Text>
+        {/* Status sits under the filters rather than bottom-left: down there
+            it collided with both the open spot card and the map attribution,
+            which has to stay visible for the licence. */}
+        <View style={styles.hudRow}>
+          <View style={[styles.hud, { backgroundColor: c.surface, borderColor: c.line }]}>
+            <Text style={[type.meta, { color: c.muted }]}>
+              {permission === "denied"
+                ? "LOCATION OFF"
+                : follow && location
+                  ? "FOLLOWING YOUR WALK"
+                  : `${visible.length} SPOTS · ${visible.filter((m) => m.marks > 0).length} MARKED`}
+            </Text>
+          </View>
+        </View>
       </View>
 
       {active && (
@@ -144,7 +135,6 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
-  brandMark: { width: 26, height: 26 },
   follow: {
     width: 40,
     height: 40,
@@ -159,20 +149,19 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
+  hudRow: { paddingHorizontal: space.md, marginTop: space.sm, flexDirection: "row" },
   hud: {
-    position: "absolute",
-    left: space.md,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: radius.pill,
     borderWidth: 1,
-    zIndex: 5,
   },
   sheet: {
     position: "absolute",
     left: space.md,
     right: space.md,
-    bottom: 20,
+    // clears the map attribution strip, which must stay legible
+    bottom: 34,
     maxWidth: 380,
     zIndex: 6,
   },

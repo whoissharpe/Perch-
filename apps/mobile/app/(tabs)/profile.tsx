@@ -1,9 +1,9 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
 import { useAuth } from "@/auth";
+import { Mark } from "@/components/Mark";
 import { SAMPLE_MARKS } from "@/sample";
 import { SpotCard } from "@/components/SpotCard";
 
@@ -26,11 +26,7 @@ export default function ProfileScreen() {
       showsVerticalScrollIndicator={false}
     >
       <View style={styles.head}>
-        <Image
-          source={require("../../assets/icon.png")}
-          style={styles.mark}
-          contentFit="contain"
-        />
+        <Mark size={56} />
         <View style={{ flex: 1 }}>
           <Text style={[type.title, { color: c.ink }]}>
             {canPost ? `@${handle}` : "Not signed in"}
@@ -78,7 +74,6 @@ export default function ProfileScreen() {
 
 const styles = StyleSheet.create({
   head: { flexDirection: "row", alignItems: "center", gap: space.sm },
-  mark: { width: 56, height: 56 },
   btn: {
     marginTop: space.md,
     paddingVertical: 13,

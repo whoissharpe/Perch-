@@ -91,6 +91,35 @@ await render({ out: W("apple-icon.png"), size: 180, background: PAPER, padRatio:
 await render({ out: M("assets/mark-pine.png"), size: 320, background: CLEAR, padRatio: 0.02, tint: PINE });
 await render({ out: M("assets/mark-paper.png"), size: 320, background: CLEAR, padRatio: 0.02, tint: PAPER });
 
+/**
+ * The open state: bird turned to face you on the bench, wings spread. Shown
+ * while its post is open. Trimmed and fitted on its own, since it is a
+ * cross-fade target rather than an animation frame — nothing has to stay in
+ * register with it.
+ */
+for (const [name, tint] of [["pine", PINE], ["paper", PAPER]]) {
+  const src = await sharp(M("assets/open-raw.png")).trim({ threshold: 1 }).png().toBuffer();
+  const { data, info } = await sharp(src)
+    .resize(320, 320, { fit: "contain", background: CLEAR })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] > 0) {
+      data[i] = tint.r;
+      data[i + 1] = tint.g;
+      data[i + 2] = tint.b;
+    }
+  }
+
+  const out = M(`assets/open-${name}.png`);
+  await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
+    .png({ compressionLevel: 9 })
+    .toFile(out);
+  console.log(`  ${out.replace(root, ".")}  320×320`);
+}
+
 /* ---------- landing-animation sprites ---------- */
 
 /** Tightest rectangle containing any non-transparent pixel. */

@@ -13,17 +13,21 @@ export const BIRD = {
     spread: require("../assets/bird-spread-pine.png"),
     perched: require("../assets/bird-perched-pine.png"),
     mark: require("../assets/mark-pine.png"),
+    open: require("../assets/open-pine.png"),
   },
   paper: {
     up: require("../assets/bird-up-paper.png"),
     spread: require("../assets/bird-spread-paper.png"),
     perched: require("../assets/bird-perched-paper.png"),
     mark: require("../assets/mark-paper.png"),
+    open: require("../assets/open-paper.png"),
   },
 } as const;
 
 export type BirdPose = "up" | "spread" | "perched";
 export type BirdTint = keyof typeof BIRD;
+/** Every drawable: the three animation poses plus the two resting states. */
+export type BirdKey = BirdPose | "mark" | "open";
 
 /**
  * Resolves an asset to a plain URL, which the DOM markers on web need.
@@ -32,7 +36,7 @@ export type BirdTint = keyof typeof BIRD;
  * react-native-web has no `Image.resolveAssetSource` to turn that into a URL.
  * expo-asset resolves it on every platform, so use that rather than branching.
  */
-export function birdUri(tint: BirdTint, key: BirdPose | "mark"): string {
+export function birdUri(tint: BirdTint, key: BirdKey): string {
   return Asset.fromModule(BIRD[tint][key]).uri;
 }
 

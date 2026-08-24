@@ -10,11 +10,11 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
 import { useAuth } from "@/auth";
+import { Mark } from "@/components/Mark";
 
 export default function SignInScreen() {
   const c = useTheme();
@@ -59,11 +59,7 @@ export default function SignInScreen() {
         }}
         keyboardShouldPersistTaps="handled"
       >
-        <Image
-          source={require("../assets/icon.png")}
-          style={styles.mark}
-          contentFit="contain"
-        />
+        <Mark size={76} />
 
         <Text style={[type.hero, { color: c.ink, marginTop: space.lg }]}>
           {stage === "email" ? "Sign in to mark spots" : "Check your email"}
@@ -187,7 +183,6 @@ export default function SignInScreen() {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  mark: { width: 76, height: 76 },
   input: {
     marginTop: space.lg,
     paddingHorizontal: 16,

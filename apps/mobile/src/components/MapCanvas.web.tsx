@@ -21,15 +21,23 @@ const PIN_SIZE = 76;
  */
 const TINT = {
   light: "saturate(0.55) sepia(0.16) hue-rotate(72deg) brightness(1.02)",
-  dark: "invert(1) hue-rotate(180deg) saturate(0.5) sepia(0.2) hue-rotate(72deg) brightness(0.85) contrast(1.05)",
+  // Invert to dark, then push hard into green and drop the brightness, so the
+  // ground reads as deep pine rather than plain black.
+  dark:
+    "invert(1) hue-rotate(180deg) grayscale(0.55) sepia(0.75) hue-rotate(78deg) saturate(2.1) brightness(0.6) contrast(1.06)",
 };
 
 interface Pin {
+  id: string;
+  marked: boolean;
   el: HTMLDivElement;
+  inner: HTMLDivElement;
   bird: HTMLImageElement;
   mark: HTMLImageElement;
+  open: HTMLImageElement;
   timers: number[];
   perched: boolean;
+  selected: boolean;
 }
 
 export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvasProps) {
@@ -38,6 +46,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
   const markers = useRef<Marker[]>([]);
   const pins = useRef<Pin[]>([]);
   const meMarker = useRef<Marker | null>(null);
+  const resizeObs = useRef<ResizeObserver | null>(null);
 
   const scheme = useColorScheme() === "dark" ? "dark" : "light";
   const c = palette[scheme];
@@ -75,18 +84,29 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
 
     m.on("click", () => onSelect(null));
 
+    // MapLibre sizes its canvas once and does not watch the container. On a
+    // phone that means a rotation, a keyboard, or any layout shift leaves the
+    // canvas stale and the map renders as a black rectangle.
+    const ro = new ResizeObserver(() => m.resize());
+    ro.observe(host.current);
+    resizeObs.current = ro;
+
     // Land or take off as the zoom crosses the threshold.
     m.on("zoom", () => {
       const shouldPerch = m.getZoom() >= PERCH_ZOOM;
       pins.current.forEach((p, i) => {
-        if (p.perched === shouldPerch) return;
+        if (!p.marked || p.perched === shouldPerch) return;
         p.perched = shouldPerch;
+        // An open bird keeps its wings out; it re-settles when deselected.
+        if (p.selected) return;
         if (shouldPerch) land(p, tintRef.current, i);
         else takeOff(p, tintRef.current);
       });
     });
 
     return () => {
+      resizeObs.current?.disconnect();
+      resizeObs.current = null;
       pins.current.forEach((p) => p.timers.forEach(clearTimeout));
       m.remove();
       map.current = null;
@@ -107,7 +127,10 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
     if (canvas) canvas.style.filter = TINT[scheme];
   }, [scheme]);
 
-  /* spot pins */
+  /* Build the pins. Deliberately NOT dependent on selectedId — rebuilding
+     every marker on each tap tears down and re-adds eleven DOM nodes, which
+     is what made selecting a bird flicker. Selection is applied by mutating
+     the existing pins in the effect below. */
   useEffect(() => {
     const m = map.current;
     if (!m) return;
@@ -119,9 +142,25 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
 
     const perched = m.getZoom() >= PERCH_ZOOM;
 
+    const layer = (extra: Partial<CSSStyleDeclaration> = {}) => {
+      const img = document.createElement("img");
+      Object.assign(img.style, {
+        position: "absolute",
+        inset: "0",
+        width: "100%",
+        height: "100%",
+        objectFit: "contain",
+        opacity: "0",
+        pointerEvents: "none",
+        transition: "opacity .2s linear, transform .22s cubic-bezier(.32,.72,0,1)",
+        ...extra,
+      });
+      img.alt = "";
+      return img;
+    };
+
     spots.forEach((s) => {
       const marked = s.marks > 0;
-      const on = selectedId === s.id;
 
       // MapLibre positions markers by writing `transform` on this root
       // element. Touching that transform ourselves detaches the pin from its
@@ -137,7 +176,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         position: "relative",
         width: marked ? `${PIN_SIZE}px` : "14px",
         height: marked ? `${PIN_SIZE}px` : "14px",
-        transform: on ? "scale(1.55)" : "scale(1)",
+        transform: "scale(1)",
         transformOrigin: "center bottom",
         transition: "transform .3s cubic-bezier(.32,.72,0,1)",
       });
@@ -152,55 +191,38 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         });
       }
 
-      const bird = document.createElement("img");
-      const mark = document.createElement("img");
+      const bird = layer();
+      const mark = layer();
+      const open = layer();
 
       if (marked) {
-        Object.assign(bird.style, {
-          position: "absolute",
-          inset: "0",
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          transition: "opacity .18s linear, transform .18s cubic-bezier(.32,.72,0,1)",
-          pointerEvents: "none",
-        });
-        Object.assign(mark.style, {
-          position: "absolute",
-          inset: "0",
-          width: "100%",
-          height: "100%",
-          objectFit: "contain",
-          opacity: "0",
-          transition: "opacity .22s linear",
-          pointerEvents: "none",
-        });
-
         bird.src = birdUri(tint, "perched");
         mark.src = birdUri(tint, "mark");
-        bird.alt = "";
-        mark.alt = "";
-
-        if (on) {
-          // Selected: wings wide. It is the tell that this is the bird whose
-          // post is open below, and it reads from across the map.
-          bird.src = birdUri(tint, "spread");
-          bird.style.opacity = "1";
-          mark.style.opacity = "0";
-        } else if (perched) {
-          bird.style.opacity = "0";
-          mark.style.opacity = "1";
-        }
-
-        inner.append(bird, mark);
+        open.src = birdUri(tint, "open");
+        bird.style.opacity = perched ? "0" : "1";
+        mark.style.opacity = perched ? "1" : "0";
+        inner.append(bird, mark, open);
       }
 
       el.addEventListener("click", (ev) => {
         ev.stopPropagation();
-        onSelect(s.id);
+        // Tapping the open bird closes it — otherwise it can never be put
+        // back on its bench without tapping empty map.
+        onSelect(selectedRef.current === s.id ? null : s.id);
       });
 
-      pins.current.push({ el, bird, mark, timers: [], perched });
+      pins.current.push({
+        id: s.id,
+        marked,
+        el,
+        inner,
+        bird,
+        mark,
+        open,
+        timers: [],
+        perched,
+        selected: false,
+      });
 
       markers.current.push(
         new maplibregl.Marker({
@@ -213,7 +235,34 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
           .addTo(m),
       );
     });
-  }, [spots, selectedId, onSelect, c.pine, tint]);
+  }, [spots, onSelect, c.pine, tint]);
+
+  /* Selection, applied by mutation so nothing is torn down. */
+  const selectedRef = useRef<string | null>(selectedId);
+  useEffect(() => {
+    selectedRef.current = selectedId;
+
+    pins.current.forEach((p) => {
+      if (!p.marked) return;
+      const on = p.id === selectedId;
+      if (p.selected === on) return;
+      p.selected = on;
+
+      p.inner.style.transform = on ? "scale(1.5)" : "scale(1)";
+
+      if (on) {
+        // Wings wide, facing you — the tell for which post is open below.
+        p.open.style.opacity = "1";
+        p.bird.style.opacity = "0";
+        p.mark.style.opacity = "0";
+      } else {
+        // Back to wings closed on the bench, or just the bird if zoomed out.
+        p.open.style.opacity = "0";
+        p.bird.style.opacity = p.perched ? "0" : "1";
+        p.mark.style.opacity = p.perched ? "1" : "0";
+      }
+    });
+  }, [selectedId]);
 
   /* the user's own position */
   useEffect(() => {
