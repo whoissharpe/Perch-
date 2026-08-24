@@ -7,6 +7,7 @@ import {
   BIRD_ZOOM,
   LANDING,
   LANDING_MS,
+  LANDING_STEP_MS,
   PERCH_ZOOM,
   birdUri,
   pinScale,
@@ -16,6 +17,7 @@ import type { MapCanvasProps } from "./MapCanvas";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
 
+
 /** Big enough that the bench reads at a glance. */
 const PIN_SIZE = 76;
 
@@ -24,15 +26,17 @@ const PIN_SIZE = 76;
  * implementation, so this stands in with MapLibre.
  *
  * Positron is a pale grey basemap. The filter pulls it toward the Perch
- * paper-and-pine ground in light and inverts it for dark, so the map belongs
+ * bone-and-olive ground in light and inverts it for dark, so the map belongs
  * to the same design as everything drawn on top of it.
  */
 const TINT = {
-  light: "saturate(0.55) sepia(0.16) hue-rotate(72deg) brightness(1.02)",
-  // Invert to dark, then push hard into green and drop the brightness, so the
-  // ground reads as deep pine rather than plain black.
+  // Warm bone with an olive cast, to match the earthy green palette.
+  light:
+    "saturate(0.5) sepia(0.34) hue-rotate(30deg) saturate(1.25) brightness(1.01)",
+  // Invert to dark, then settle into a muted forest green — not black, and
+  // not the harder pine the palette used to run on.
   dark:
-    "invert(1) hue-rotate(180deg) grayscale(0.55) sepia(0.75) hue-rotate(78deg) saturate(2.1) brightness(0.6) contrast(1.06)",
+    "invert(1) hue-rotate(180deg) grayscale(0.5) sepia(0.62) hue-rotate(62deg) saturate(1.7) brightness(0.66) contrast(1.04)",
 };
 
 interface Pin {
@@ -47,6 +51,8 @@ interface Pin {
   timers: number[];
   perched: boolean;
   selected: boolean;
+  /** True while the landing sequence is running. */
+  animating: boolean;
 }
 
 export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvasProps) {
@@ -135,7 +141,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
   }, [tint]);
 
   /* theme tint — on the canvas itself, never getCanvasContainer(). The
-     container also holds the markers, and inverting it turns every blaze
+     container also holds the markers, and inverting it turns every brass
      pin green. */
   useEffect(() => {
     const canvas = map.current?.getCanvas();
@@ -167,7 +173,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         objectFit: "contain",
         opacity: "0",
         pointerEvents: "none",
-        transition: "opacity .2s linear, transform .22s cubic-bezier(.32,.72,0,1)",
+        transition: `opacity .28s linear, transform ${LANDING_STEP_MS}ms cubic-bezier(.32,.72,0,1)`,
         ...extra,
       });
       img.alt = "";
@@ -221,8 +227,8 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         height: "11px",
         marginLeft: "-5.5px",
         borderRadius: "50%",
-        background: c.blaze,
-        boxShadow: `0 0 0 4px ${c.blaze}33`,
+        background: c.brass,
+        boxShadow: `0 0 0 4px ${c.brass}33`,
         opacity: "0",
         pointerEvents: "none",
         transition: "opacity .2s linear",
@@ -254,6 +260,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         timers: [],
         perched,
         selected: false,
+        animating: false,
       });
 
       markers.current.push(
@@ -273,7 +280,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
     pins.current.forEach((p) => {
       if (p.marked) applyZoom(p, z);
     });
-  }, [spots, onSelect, c.pine, c.blaze, tint]);
+  }, [spots, onSelect, c.pine, c.brass, tint]);
 
   /* Selection, applied by mutation so nothing is torn down. */
   const selectedRef = useRef<string | null>(selectedId);
@@ -365,6 +372,15 @@ function applyZoom(pin: Pin, zoom: number) {
     return;
   }
 
+  // While a landing is in flight the animation owns the layer opacities.
+  // Zoom fires continuously during a gesture, so writing them here too would
+  // slam the bird to hidden on the very next tick and the landing would never
+  // be seen. Only cancel if the map has zoomed clean out of bird range.
+  if (pin.animating) {
+    if (!far) return;
+    cancel(pin);
+  }
+
   pin.dot.style.opacity = far ? "1" : "0";
 
   if (far) {
@@ -377,13 +393,23 @@ function applyZoom(pin: Pin, zoom: number) {
   }
 }
 
+/** Stops a landing and drops the pin straight to its resting state. */
+function cancel(pin: Pin) {
+  pin.timers.forEach(clearTimeout);
+  pin.timers = [];
+  pin.animating = false;
+  pin.bird.style.transform = "translateY(0px)";
+}
+
 /** Swoop, two wingbeats, settle — then the bench arrives underneath. */
 function land(pin: Pin, tint: BirdTint, index: number) {
   pin.timers.forEach(clearTimeout);
   pin.timers = [];
+  pin.animating = true;
+  pin.dot.style.opacity = "0";
 
   // A small stagger so a screenful of birds does not land in lockstep.
-  const offset = (index % 5) * 55;
+  const offset = (index % 5) * 70;
 
   pin.mark.style.opacity = "0";
   pin.bird.style.opacity = "1";
@@ -401,6 +427,7 @@ function land(pin: Pin, tint: BirdTint, index: number) {
     window.setTimeout(() => {
       pin.mark.style.opacity = "1";
       pin.bird.style.opacity = "0";
+      pin.animating = false;
     }, offset + LANDING_MS),
   );
 }
@@ -409,6 +436,7 @@ function land(pin: Pin, tint: BirdTint, index: number) {
 function takeOff(pin: Pin, tint: BirdTint) {
   pin.timers.forEach(clearTimeout);
   pin.timers = [];
+  pin.animating = false;
 
   pin.bird.src = birdUri(tint, "perched");
   pin.bird.style.transform = "translateY(0px)";

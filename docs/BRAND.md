@@ -30,23 +30,27 @@ smudge. Use the wordmark alone there.
 
 ## Palette
 
-Crisp paper, one deep pine, and blaze orange reserved strictly for map
-semantics. **If something is orange it means something on the map** — a pin, a
-new mark, your location, the capture button. Colour is never decoration here.
+Earthy forest green: olive and sage on warm bone, with brass as the single
+accent. **If something is brass it means something on the map** — a pin, a new
+mark, your location, the capture button. Colour is never decoration here.
 
 | Token | Light | Dark | Use |
 |---|---|---|---|
-| `paper` | `#fcfcfa` | `#0e1613` | Page ground |
-| `surface` | `#ffffff` | `#16211d` | Cards, nav, sheets |
-| `sunk` | `#f0f3f0` | `#0a100e` | Bands, map ground |
-| `ink` | `#16211d` | `#edf2ef` | Primary text — never pure black |
-| `body` | `#3d4a45` | `#c3cfc9` | Body copy |
-| `muted` | `#77837d` | `#7e8c86` | Meta, coordinates |
-| `pine` | `#1c4034` | `#8fbba6` | The brand. Primary actions, the mark |
-| `blaze` | `#e1622f` | `#f2814f` | Map semantics only |
+| `paper` | `#f4f2e9` | `#131a14` | Page ground |
+| `surface` | `#fcfbf6` | `#1c2620` | Cards, nav, sheets |
+| `sunk` | `#e7e5d9` | `#0e1410` | Bands, map ground |
+| `ink` | `#1e2a21` | `#edf0e7` | Primary text — never pure black |
+| `body` | `#3d4b3f` | `#c4cdbf` | Body copy |
+| `muted` | `#7b8479` | `#838c7e` | Meta, coordinates |
+| `pine` | `#445c42` | `#a8be9c` | The brand. Primary actions, the mark |
+| `brass` | `#b7863f` | `#d8a961` | Map semantics only |
 
-The neutral is biased warm-green toward the pine rather than a pure grey, so it
-reads as chosen rather than inherited.
+The neutral is a warm bone biased toward the olive rather than a pure grey, so
+it reads as chosen rather than inherited.
+
+Brass replaced an earlier blaze orange. Against this much green the orange
+shouted; a warm metal sits in the same world while staying clearly separate
+from every green on screen, which is what a map accent has to do.
 
 Single source of truth: `packages/core/src/theme.ts`. The web mirrors it as CSS
 custom properties in `apps/web/app/globals.css`.

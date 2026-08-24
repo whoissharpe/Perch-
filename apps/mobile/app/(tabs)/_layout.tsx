@@ -50,7 +50,7 @@ export default function TabsLayout() {
               accessibilityRole="button"
               accessibilityLabel="Mark a spot"
             >
-              <View style={[styles.markBtn, { backgroundColor: c.blaze }]}>
+              <View style={[styles.markBtn, { backgroundColor: c.brass }]}>
                 <Icon name="plus" color="#fff" size={22} />
               </View>
             </Pressable>

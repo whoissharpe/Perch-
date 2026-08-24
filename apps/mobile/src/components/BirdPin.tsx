@@ -1,7 +1,14 @@
 import { useEffect, useRef, useState } from "react";
 import { Animated, Easing, StyleSheet, View } from "react-native";
 import { Image } from "expo-image";
-import { BIRD, LANDING, LANDING_MS, type BirdPose, type BirdTint } from "@/birdSprites";
+import {
+  BIRD,
+  LANDING,
+  LANDING_MS,
+  LANDING_STEP_MS,
+  type BirdPose,
+  type BirdTint,
+} from "@/birdSprites";
 
 /**
  * A marked spot's pin. Zoomed out it is the bird alone; once the map is close
@@ -53,7 +60,7 @@ export function BirdPin({
     }
 
     // A small stagger so a screenful of birds does not land in lockstep.
-    const offset = (index % 5) * 55;
+    const offset = (index % 5) * 70;
 
     benchIn.setValue(0);
     birdOut.setValue(1);
@@ -64,7 +71,7 @@ export function BirdPin({
           setPose(step.pose);
           Animated.timing(lift, {
             toValue: -step.lift,
-            duration: 120,
+            duration: LANDING_STEP_MS,
             easing: Easing.bezier(0.32, 0.72, 0, 1),
             useNativeDriver: true,
           }).start();
@@ -75,8 +82,8 @@ export function BirdPin({
     timers.current.push(
       setTimeout(() => {
         Animated.parallel([
-          Animated.timing(benchIn, { toValue: 1, duration: 220, useNativeDriver: true }),
-          Animated.timing(birdOut, { toValue: 0, duration: 220, useNativeDriver: true }),
+          Animated.timing(benchIn, { toValue: 1, duration: 240, useNativeDriver: true }),
+          Animated.timing(birdOut, { toValue: 0, duration: 240, useNativeDriver: true }),
         ]).start();
       }, offset + LANDING_MS),
     );
@@ -95,7 +102,7 @@ export function BirdPin({
     // unreadable pile, so far out each spot is just a point.
     return (
       <View style={styles.dotWrap}>
-        <View style={[styles.dot, { backgroundColor: BLAZE }]} />
+        <View style={[styles.dot, { backgroundColor: BRASS }]} />
       </View>
     );
   }
@@ -139,7 +146,7 @@ export function BirdPin({
   );
 }
 
-const BLAZE = "#e1622f";
+const BRASS = "#b7863f";
 
 const styles = StyleSheet.create({
   wrap: { alignItems: "center", justifyContent: "center" },

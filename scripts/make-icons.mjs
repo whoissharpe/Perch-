@@ -16,8 +16,8 @@ import { fileURLToPath } from "node:url";
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const MASTER = resolve(root, "apps/web/public/logo.png");
 
-const PAPER = { r: 252, g: 252, b: 250, alpha: 1 };
-const PINE = { r: 28, g: 64, b: 52, alpha: 1 };
+const PAPER = { r: 244, g: 242, b: 233, alpha: 1 };
+const PINE = { r: 68, g: 92, b: 66, alpha: 1 };
 const CLEAR = { r: 0, g: 0, b: 0, alpha: 0 };
 
 /**

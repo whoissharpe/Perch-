@@ -45,14 +45,22 @@ export function birdUri(tint: BirdTint, key: BirdKey): string {
  * animation reads identically — a beat of descent, two wingbeats, then settle.
  */
 export const LANDING = [
-  { at: 0, pose: "up" as BirdPose, lift: 22 },
-  { at: 130, pose: "spread" as BirdPose, lift: 13 },
-  { at: 270, pose: "up" as BirdPose, lift: 6 },
-  { at: 390, pose: "spread" as BirdPose, lift: 2 },
-  { at: 500, pose: "perched" as BirdPose, lift: 0 },
+  { at: 0, pose: "up" as BirdPose, lift: 26 },
+  { at: 170, pose: "spread" as BirdPose, lift: 19 },
+  { at: 360, pose: "up" as BirdPose, lift: 11 },
+  { at: 550, pose: "spread" as BirdPose, lift: 4 },
+  { at: 730, pose: "perched" as BirdPose, lift: 0 },
 ];
 
-export const LANDING_MS = 640;
+/** When the bench arrives, just after the bird settles. */
+export const LANDING_MS = 900;
+
+/**
+ * How long the bird takes to glide between two frames. Has to be a little
+ * shorter than the gap between beats, or the descent never quite arrives
+ * before the next one starts and the whole thing reads as a blur.
+ */
+export const LANDING_STEP_MS = 165;
 
 /** Past this zoom the bench is legible, so the bird gets something to sit on. */
 export const PERCH_ZOOM = 15.5;

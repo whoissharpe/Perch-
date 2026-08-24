@@ -106,7 +106,7 @@ export default function MarkScreen() {
           <Text
             style={[
               type.body,
-              { color: ready ? c.blaze : c.muted, fontWeight: "600" },
+              { color: ready ? c.brass : c.muted, fontWeight: "600" },
             ]}
           >
             Post
@@ -147,7 +147,7 @@ export default function MarkScreen() {
 
         {/* position */}
         <View style={[styles.coords, { borderColor: c.line }]}>
-          <Icon name="pin" color={c.blaze} size={16} />
+          <Icon name="pin" color={c.brass} size={16} />
           <Text style={[type.meta, { color: coords ? c.body : c.muted }]}>
             {coords ? formatCoords(coords.lat, coords.lng) : "FINDING YOU…"}
           </Text>
@@ -228,12 +228,12 @@ export default function MarkScreen() {
                 style={[
                   styles.chip,
                   {
-                    backgroundColor: on ? c.blazeSoft : c.surface,
-                    borderColor: on ? c.blaze : c.line,
+                    backgroundColor: on ? c.brassSoft : c.surface,
+                    borderColor: on ? c.brass : c.line,
                   },
                 ]}
               >
-                <Text style={[type.small, { color: on ? c.blaze : c.body }]}>
+                <Text style={[type.small, { color: on ? c.brass : c.body }]}>
                   {a.label}
                 </Text>
               </Pressable>

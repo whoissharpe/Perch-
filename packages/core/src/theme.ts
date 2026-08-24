@@ -2,38 +2,45 @@
  * One source of truth for the brand, shared by the mobile app and the
  * marketing site. The web mirrors these as CSS custom properties in
  * apps/web/app/globals.css — if you change a value here, change it there.
+ *
+ * Earthy forest green: olive and sage greens on warm bone, with brass as the
+ * single accent. Brass replaces the old blaze orange — against this much
+ * green a bright orange shouted, where a warm metal sits in the same world
+ * while staying clearly separate from every green on screen.
  */
 
 export const palette = {
   light: {
-    paper: "#fcfcfa",
-    surface: "#ffffff",
-    sunk: "#f0f3f0",
-    ink: "#16211d",
-    body: "#3d4a45",
-    muted: "#77837d",
-    pine: "#1c4034",
-    pineSoft: "#e7eeea",
-    blaze: "#e1622f",
-    blazeSoft: "#fceee7",
-    line: "rgba(22, 33, 29, 0.12)",
-    lineSoft: "rgba(22, 33, 29, 0.07)",
-    onPine: "#fcfcfa",
+    paper: "#f4f2e9",
+    surface: "#fcfbf6",
+    sunk: "#e7e5d9",
+    ink: "#1e2a21",
+    body: "#3d4b3f",
+    muted: "#7b8479",
+    /** The brand green. The mark is drawn in this. */
+    pine: "#445c42",
+    pineSoft: "#e1e7da",
+    /** Map semantics only: a pin, a new mark, your location. */
+    brass: "#b7863f",
+    brassSoft: "#f3e9d6",
+    line: "rgba(30, 42, 33, 0.13)",
+    lineSoft: "rgba(30, 42, 33, 0.07)",
+    onPine: "#f4f2e9",
   },
   dark: {
-    paper: "#0e1613",
-    surface: "#16211d",
-    sunk: "#0a100e",
-    ink: "#edf2ef",
-    body: "#c3cfc9",
-    muted: "#7e8c86",
-    pine: "#8fbba6",
-    pineSoft: "rgba(143, 187, 166, 0.13)",
-    blaze: "#f2814f",
-    blazeSoft: "rgba(242, 129, 79, 0.14)",
-    line: "rgba(237, 242, 239, 0.13)",
-    lineSoft: "rgba(237, 242, 239, 0.07)",
-    onPine: "#0e1613",
+    paper: "#131a14",
+    surface: "#1c2620",
+    sunk: "#0e1410",
+    ink: "#edf0e7",
+    body: "#c4cdbf",
+    muted: "#838c7e",
+    pine: "#a8be9c",
+    pineSoft: "rgba(168, 190, 156, 0.14)",
+    brass: "#d8a961",
+    brassSoft: "rgba(216, 169, 97, 0.15)",
+    line: "rgba(237, 240, 231, 0.13)",
+    lineSoft: "rgba(237, 240, 231, 0.07)",
+    onPine: "#131a14",
   },
 } as const;
 

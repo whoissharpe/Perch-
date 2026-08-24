@@ -17,9 +17,9 @@ const STYLE_URL =
 
 const HOME: [number, number] = [-9.1394, 38.7223];
 
-/** Marked spots burn blaze; unmarked pins stay quiet pine outlines. */
-const BLAZE = "#e1622f";
-const PINE = "#1c4034";
+/** Marked spots burn brass; unmarked pins stay quiet pine outlines. */
+const BRASS = "#b7863f";
+const PINE = "#445c42";
 
 export default function PerchMap() {
   const container = useRef<HTMLDivElement>(null);
@@ -118,7 +118,7 @@ export default function PerchMap() {
         paint: { "text-color": PINE },
       });
 
-      // A spot somebody has photographed reads solid blaze. One that is
+      // A spot somebody has photographed reads solid brass. One that is
       // only a pin stays hollow — so the map shows at a glance how much
       // of a place has actually been visited.
       m.addLayer({
@@ -128,9 +128,9 @@ export default function PerchMap() {
         filter: ["!", ["has", "point_count"]],
         paint: {
           "circle-radius": ["case", ["get", "marked"], 8, 5.5],
-          "circle-color": ["case", ["get", "marked"], BLAZE, "rgba(0,0,0,0)"],
+          "circle-color": ["case", ["get", "marked"], BRASS, "rgba(0,0,0,0)"],
           "circle-stroke-width": 1.8,
-          "circle-stroke-color": ["case", ["get", "marked"], BLAZE, PINE],
+          "circle-stroke-color": ["case", ["get", "marked"], BRASS, PINE],
         },
       });
 
@@ -203,7 +203,7 @@ export default function PerchMap() {
         </span>
       </div>
 
-      <button className="map-add btn btn--blaze">
+      <button className="map-add btn btn--brass">
         <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true">
           <path d="M8 3.2v9.6M3.2 8h9.6" strokeLinecap="round" />
         </svg>

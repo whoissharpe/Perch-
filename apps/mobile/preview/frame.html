@@ -6,18 +6,18 @@
 <title>Perch — iPhone preview</title>
 <style>
   :root {
-    --bg: #0b120f;
-    --panel: #16211d;
-    --line: rgba(237,242,239,.14);
-    --ink: #edf2ef;
-    --muted: #8b9a93;
-    --pine: #8fbba6;
-    --blaze: #f2814f;
+    --bg: #0f150f;
+    --panel: #1c2620;
+    --line: rgba(237,240,231,.14);
+    --ink: #edf0e7;
+    --muted: #8b937e;
+    --pine: #a8be9c;
+    --brass: #d8a961;
   }
   * { box-sizing: border-box; margin: 0; }
   body {
     background:
-      radial-gradient(1000px 600px at 50% -10%, #16241d, transparent 70%),
+      radial-gradient(1000px 600px at 50% -10%, #1a2418, transparent 70%),
       var(--bg);
     color: var(--ink);
     font: 15px/1.5 ui-sans-serif, system-ui, sans-serif;
@@ -40,7 +40,7 @@
     height: 868px;
     border-radius: 58px;
     padding: 12px;
-    background: linear-gradient(160deg, #33403a, #101714 60%);
+    background: linear-gradient(160deg, #37402f, #131a12 60%);
     box-shadow:
       0 1px 1px rgba(255,255,255,.22) inset,
       0 40px 90px rgba(0,0,0,.55),
@@ -53,22 +53,22 @@
     height: 844px;
     border-radius: 46px;
     overflow: hidden;
-    background: #0e1613;
+    background: #131a14;
   }
   .screen iframe { width: 390px; height: 844px; border: 0; display: block; }
   .notch {
     position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
-    width: 112px; height: 30px; border-radius: 999px; background: #0a0f0d;
+    width: 112px; height: 30px; border-radius: 999px; background: #0d120c;
     z-index: 5; pointer-events: none;
   }
 
   aside { max-width: 320px; display: grid; gap: 18px; }
   .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 18px; }
   .card h2 { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; font-weight: 600; }
-  ol, ul { margin: 0; padding-left: 18px; display: grid; gap: 9px; font-size: 13.5px; color: #cfdad4; }
+  ol, ul { margin: 0; padding-left: 18px; display: grid; gap: 9px; font-size: 13.5px; color: #cdd4c4; }
   li b { color: var(--ink); font-weight: 600; }
   .k { color: var(--pine); font-weight: 600; }
-  .b { color: var(--blaze); font-weight: 600; }
+  .b { color: var(--brass); font-weight: 600; }
   .row { display: flex; gap: 8px; flex-wrap: wrap; }
   button {
     font: inherit; font-size: 13px; color: var(--ink); cursor: pointer;
@@ -76,7 +76,7 @@
     border-radius: 999px; padding: 8px 14px;
   }
   button:hover { border-color: var(--pine); }
-  button.on { background: var(--pine); border-color: var(--pine); color: #0e1613; font-weight: 600; }
+  button.on { background: var(--pine); border-color: var(--pine); color: #131a14; font-weight: 600; }
   .note { font-size: 12.5px; color: var(--muted); }
 </style>
 </head>
@@ -106,7 +106,7 @@
         <li><b>Tap a bird.</b> It turns to face you with <span class="k">wings spread</span> and its post opens below.</li>
         <li><b>Tap it again</b> to fold its wings and put it back on the bench.</li>
         <li><b>Hollow rings</b> are spots seeded from OpenStreetMap that nobody has photographed yet.</li>
-        <li><b>The <span class="b">orange +</span></b> is the capture flow — it asks you to sign in first.</li>
+        <li><b>The <span class="b">brass +</span></b> is the capture flow — it asks you to sign in first.</li>
       </ol>
     </div>
 

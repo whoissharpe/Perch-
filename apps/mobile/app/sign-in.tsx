@@ -158,8 +158,8 @@ export default function SignInScreen() {
         )}
 
         {error && (
-          <View style={[styles.error, { backgroundColor: c.blazeSoft }]}>
-            <Text style={[type.small, { color: c.blaze }]}>{error}</Text>
+          <View style={[styles.error, { backgroundColor: c.brassSoft }]}>
+            <Text style={[type.small, { color: c.brass }]}>{error}</Text>
           </View>
         )}
 
