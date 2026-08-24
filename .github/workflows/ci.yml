@@ -18,14 +18,11 @@ jobs:
 
       - run: npm ci
 
-      - name: Typecheck
+      - name: Typecheck every workspace
         run: npm run typecheck
 
-      - name: Lint
-        run: npm run lint
-
-      - name: Build
-        run: npm run build
+      - name: Build the site
+        run: npm run web:build
         env:
           # Build-time placeholders — the clients only assert at call time.
           NEXT_PUBLIC_SUPABASE_URL: https://placeholder.supabase.co

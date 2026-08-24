@@ -1,31 +1,26 @@
 {
   "name": "perch",
-  "version": "0.1.0",
   "private": true,
-  "description": "A map of the world's best places to sit down.",
+  "version": "0.1.0",
+  "description": "A shared map of good places to stop.",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "typecheck": "tsc --noEmit",
+    "web": "npm run dev --workspace @perch/web",
+    "web:build": "npm run build --workspace @perch/web",
+    "mobile": "npm start --workspace @perch/mobile",
+    "ios": "npm run ios --workspace @perch/mobile",
+    "android": "npm run android --workspace @perch/mobile",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
     "seed:osm": "tsx scripts/seed-osm.ts",
+    "icons": "node scripts/make-icons.mjs",
     "db:push": "supabase db push"
   },
-  "dependencies": {
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.45.4",
-    "maplibre-gl": "^4.7.1",
-    "next": "^15.0.3",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1"
-  },
   "devDependencies": {
-    "@types/node": "^22.9.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "eslint": "^8.57.1",
-    "eslint-config-next": "^15.0.3",
+    "sharp": "^0.33.5",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   },

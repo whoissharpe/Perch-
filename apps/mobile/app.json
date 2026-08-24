@@ -1,0 +1,58 @@
+{
+  "expo": {
+    "name": "Perch",
+    "slug": "perch",
+    "scheme": "perch",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fcfcfa",
+      "dark": { "backgroundColor": "#0e1613" }
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "app.perch.perch",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Perch shows you good places to stop near you, and tags the spots you mark with where they are.",
+        "NSCameraUsageDescription": "Marking a spot means taking a photo or a short video of it.",
+        "NSPhotoLibraryUsageDescription": "Pick a photo or video you already took at the spot."
+      }
+    },
+    "android": {
+      "package": "app.perch.perch",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1c4034"
+      },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "READ_MEDIA_VIDEO"
+      ]
+    },
+    "plugins": [
+      "expo-router",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Perch shows you good places to stop near you."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Pick a photo or video you took at the spot.",
+          "cameraPermission": "Marking a spot means photographing it."
+        }
+      ]
+    ],
+    "experiments": { "typedRoutes": true }
+  }
+}

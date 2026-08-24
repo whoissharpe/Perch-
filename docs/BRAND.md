@@ -2,16 +2,68 @@
 
 ## The name
 
-**Perch.** A perch is any place you stop briefly and comfortably. It is short,
+**Perch.** A perch is any place you stop briefly and comfortably. Short,
 verbable ("perched at the miradouro"), and — the reason it beat the
-alternatives — it does not cap the product at benches. When the map grows into
-shade, fountains, low walls and step-free ledges, the name still fits. A name
-like *BenchApp* would have needed replacing at exactly the moment replacing it
-became expensive.
+alternatives — it does not cap the product at benches. When the map is mostly
+ridges and rock ledges, the name still fits.
 
-Rejected: *Loiter* (the policing connotation clashes badly with the
-accessibility positioning), *Benchmark* (permanently SEO-poisoned by the
-software and finance meanings), *Sitwell* (reads as a wellness brand).
+Rejected: *Loiter* (the policing connotation clashes with the accessibility
+angle), *Benchmark* (permanently SEO-poisoned by the software meaning),
+*Sitwell* (reads as a wellness brand).
+
+## The mark
+
+A slender bird in a bow tie, perched on a park bench. Fine monoline, one
+uniform stroke weight, rounded caps, drawn in a single pine green.
+
+It earns its place three ways: the bird *is* the name, the bench says what the
+product is about, and the bow tie is the whole personality in one detail —
+this is a product about sitting still and enjoying something, treated with
+slightly more ceremony than it strictly needs.
+
+Master file: `apps/web/public/logo.png`, transparent. Every other size — iOS
+icon, Android adaptive foreground, splash, favicon — is generated from it by
+`npm run icons`. Do not hand-edit the derivatives.
+
+At sizes below about 28px the bench stops resolving and the mark reads as a
+smudge. Use the wordmark alone there.
+
+## Palette
+
+Crisp paper, one deep pine, and blaze orange reserved strictly for map
+semantics. **If something is orange it means something on the map** — a pin, a
+new mark, your location, the capture button. Colour is never decoration here.
+
+| Token | Light | Dark | Use |
+|---|---|---|---|
+| `paper` | `#fcfcfa` | `#0e1613` | Page ground |
+| `surface` | `#ffffff` | `#16211d` | Cards, nav, sheets |
+| `sunk` | `#f0f3f0` | `#0a100e` | Bands, map ground |
+| `ink` | `#16211d` | `#edf2ef` | Primary text — never pure black |
+| `body` | `#3d4a45` | `#c3cfc9` | Body copy |
+| `muted` | `#77837d` | `#7e8c86` | Meta, coordinates |
+| `pine` | `#1c4034` | `#8fbba6` | The brand. Primary actions, the mark |
+| `blaze` | `#e1622f` | `#f2814f` | Map semantics only |
+
+The neutral is biased warm-green toward the pine rather than a pure grey, so it
+reads as chosen rather than inherited.
+
+Single source of truth: `packages/core/src/theme.ts`. The web mirrors it as CSS
+custom properties in `apps/web/app/globals.css`.
+
+## Type
+
+| Role | Family | Notes |
+|---|---|---|
+| Display | **Fraunces** | `SOFT 30, WONK 1`. The wonk is the point — it matches the hand-drawn quality of the mark. Request the axes explicitly in the Google Fonts URL or they silently do nothing |
+| Body & UI | **Instrument Sans** | `1.6` line-height |
+| Coordinates, meta, eyebrows | **Space Mono** | Uppercase, `0.06em` tracking |
+
+Banned: Inter, Roboto, Arial, Open Sans, Helvetica.
+
+Every spot card carries its real coordinates in Space Mono. This is not
+decoration — a shared map should say where things are, and it is the detail
+that stops the cards looking like generic social posts.
 
 ## Voice
 
@@ -21,68 +73,26 @@ sound like it.
 - Say the concrete thing. "Shade at 2pm", not "optimised comfort insights".
 - Short sentences are allowed to be very short.
 - Dry, never zany. The subject is already faintly funny; leaning on the joke
-  makes it a one-post gag, which is precisely the failure mode.
-- Never write "Elevate", "Seamless", "Unleash", "Next-gen", "Game-changer",
-  "Delve", or "Discover the power of".
-- No emoji, anywhere — not in UI, not in copy, not in alt text.
+  turns it into a one-post gag, which is exactly the failure mode.
+- Never: "Elevate", "Seamless", "Unleash", "Next-gen", "Game-changer",
+  "Discover the power of".
+- No emoji anywhere — not in UI, not in copy, not in alt text.
 
-On accessibility copy specifically: write about people, not about compliance,
-and never make someone's mobility sound like a market segment.
-
-## Palette
-
-Warm monochrome canvas with moss and clay as scarce spot colour. Colour is used
-semantically — a rating that is filled, a tag that is confirmed — never as
-decoration.
-
-| Token | Light | Dark | Use |
-|---|---|---|---|
-| `--canvas` | `#fbf9f4` | `#14130f` | Page ground |
-| `--canvas-raised` | `#fffdf9` | `#1c1a16` | Cards, nav |
-| `--canvas-sunk` | `#f3efe6` | `#100f0c` | Bezel trays, bands |
-| `--ink` | `#171512` | `#f3efe7` | Primary text — never pure black |
-| `--ink-2` | `#423c33` | `#c9c1b4` | Body |
-| `--muted` | `#7a7167` | `#8b8175` | Meta |
-| `--moss` | `#46543f` | `#a8bb9c` | Filled ratings, confirmed tags |
-| `--clay` | `#a6553c` | `#d89a80` | Step numerals, warnings |
-
-No gradients as decoration. No glassmorphism outside fixed chrome (nav bar, map
-HUD). No AI-default purple, ever.
-
-## Type
-
-| Role | Family | Notes |
-|---|---|---|
-| Display | Instrument Serif | `-0.028em` tracking, `0.94` line-height. Italic is the emphasis mechanism, paired with moss |
-| UI and body | Plus Jakarta Sans | `1.62` line-height |
-| Meta, eyebrows, numerals | JetBrains Mono | `0.2em` tracking, uppercase |
-
-Banned: Inter, Roboto, Arial, Open Sans, Helvetica.
-
-## Surfaces
-
-Nothing premium sits flat on the canvas. The `.bezel` pattern is an outer tray
-(sunk background, hairline border, 6px padding, 30px radius) holding an inner
-plate (raised background, `24px` radius, inset top highlight). The radii are
-concentric on purpose — mismatched corners are the single fastest way to make a
-card look cheap.
-
-Shadows are ultra-diffuse and low opacity. Harsh dark drop shadows are banned.
+On accessibility copy: write about people, not compliance, and never make
+someone's mobility sound like a market segment.
 
 ## Motion
 
-- Easing is always `cubic-bezier(0.32, 0.72, 0, 1)` — weighted, physical.
-  Never `linear`, never bare `ease-in-out`.
-- Scroll entry: fade up 28px with a 6px blur dissolve, 900ms, staggered 90ms
-  by index. Driven by `IntersectionObserver`, never a scroll listener.
-- Buttons scale to `0.978` on press. The trailing arrow lives in its own
-  circular well and translates diagonally on hover.
-- Everything animates via `transform` and `opacity` only.
+- Easing is `cubic-bezier(0.32, 0.72, 0, 1)` — weighted, physical. Never
+  `linear`, never bare `ease-in-out`.
+- Scroll entry: fade up 22px over 800ms, staggered 80ms by index, driven by
+  `IntersectionObserver` — never a scroll listener.
+- Buttons scale to `0.975` on press.
+- `transform` and `opacity` only.
 - `prefers-reduced-motion` disables all of it and reveals content immediately.
 
-## The mark
+## Structure
 
-A dot resting on a bench: circle above a horizontal rail with two legs and a
-stretcher. Four strokes, `1.6` weight, `currentColor`. It reads as a person on
-a bench, a bird on a perch, and a map pin, which is the whole product in one
-glyph.
+Numbering means sequence. The three steps in "How it works" are numbered
+because they happen in order. Parallel facts are not numbered, because implying
+an order that does not exist is a lie told in furniture.

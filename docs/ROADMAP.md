@@ -1,57 +1,57 @@
 # Roadmap
 
 Sequenced so the falsifiable test happens before the expensive work. Read
-`STRATEGY.md` first — the kill criterion gates everything below.
+[`STRATEGY.md`](STRATEGY.md) first — the kill criterion gates everything below.
 
-## Phase 0 — Seed (days 1–2)
+## Phase 0 — Foundations ✅
 
-- [x] Repository, design system, landing page
-- [ ] Supabase project; run `supabase/migrations/0001_init.sql`
-- [ ] `npm run seed:osm` for one bounding box (Lisbon by default)
-- [ ] Confirm the real bench count and attribute coverage for that city.
-      This settles the "is OSM full or empty" question empirically.
+- [x] Workspace: `apps/mobile`, `apps/web`, `packages/core`
+- [x] Brand: mark, palette, type, icon pipeline
+- [x] Schema: spots / marks / saves / follows, PostGIS, RLS, counter triggers
+- [x] Expo app shell: map, feed, saved, profile, capture, spot detail
+- [x] Marketing site with a browsable web map
 
-## Phase 1 — The one screen (days 3–10)
+## Phase 1 — Make it real (week 1–2)
 
-- [ ] Magic-link auth (Supabase), minimal profile with a handle
-- [ ] Map with clustered pins; solid = sat on, hollow = untouched
-- [ ] Bench sheet: three-axis rating, one photo, 280-character note
-- [ ] Attribute enrichment — the six tags OSM does not carry
-- [ ] Add-a-missing-bench flow
-- [ ] Install-to-homescreen (manifest + service worker)
+- [ ] Supabase project; `npm run db:push`
+- [ ] `npm run seed:osm` for one bounding box, and record the real coverage
+      numbers — this settles empirically how much OSM actually has
+- [ ] Magic-link auth and handle claiming
+- [ ] **Wire the capture flow end to end**: upload to the `marks` bucket,
+      insert spot if new, insert mark. This is the one path that must not have
+      a rough edge
+- [ ] Swap the sample data in `apps/mobile/src/sample.ts` for live queries
+- [ ] Offline capture queue — take the photo with no signal, upload on return.
+      Non-negotiable for the hiking half
 
-Explicitly not in this phase: feed, follows, comments, leaderboards, badges.
+## Phase 2 — The test (day 15–45)
 
-## Phase 2 — The test (days 11–40)
+- [ ] TestFlight and Play internal testing, one city only
+- [ ] Run distribution alongside it — a local account posting the best finds.
+      The test is invalid in a vacuum
+- [ ] Instrument: marks per user, D7/D30 return rate, marks from non-friends,
+      follow graph density
+- [ ] **Decision point.** 30 marks from 15 strangers in 30 days, or stop
 
-- [ ] Ship to one city and nowhere else
-- [ ] Run distribution alongside it — a local account posting the best seeded
-      finds. The test is invalid in a vacuum.
-- [ ] Instrument: sits per user, D7 and D30 return rate, photos from
-      non-friends, attribute edits per session
-- [ ] **Decision point.** 30 photos from 15 strangers in 30 days, or stop.
+## Phase 3 — Only if Phase 2 passes
 
-## Phase 3 — Pro, only if Phase 2 passes (weeks 7–12)
-
-- [ ] Rest routing: never more than *N* metres between places to sit
-- [ ] Offline city packs
-- [ ] Shade forecasting by time of day (sun position against building heights)
-- [ ] Step-free approach filtering
-- [ ] Stripe Checkout, €3.50/month or €29/year
-
-## Phase 4 — The social layer earns its way in
-
-Only the pieces retention data actually asks for:
-
+- [ ] Moderation: report flow, takedown queue, EXIF stripping on upload.
+      Currently the largest unbuilt piece, and it becomes urgent the moment
+      strangers can post video
+- [ ] Comments and mentions
 - [ ] Collections — sequences worth walking
-- [ ] Follows and a quiet feed
-- [ ] City leaderboards for attribute contributions, not for sit counts
-      (rewarding the behaviour that makes the map useful, not the one that
-      makes it noisy)
+- [ ] Elevation and sun position per spot
+
+## Phase 4 — Pro (week 8–14)
+
+- [ ] Offline region packs
+- [ ] Rest routing: never more than *N* metres between places to sit
+- [ ] Shade forecasting by time of day
+- [ ] Stripe, €3.50/month or €29/year, 30-day trial
 
 ## Later, and only on their terms
 
-- [ ] Memorial dedications, built with a parks department as a partner. Legal
-      review before a single line of code. See `STRATEGY.md`.
+- [ ] Memorial dedications, with a parks department as partner and legal review
+      first. See `STRATEGY.md` — this is a legal question, not a scheduling one
 - [ ] Municipal rest-point inventories and shade gap analysis
 - [ ] A rest-aware routing API

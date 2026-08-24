@@ -1,11 +1,14 @@
 <div align="center">
 
+<img src="apps/web/public/logo.webp" width="180" alt="Perch" />
+
 # Perch
 
-**Every good place to sit down.**
+**Somebody already found the good spot.**
 
-A map of the world's benches — the ones with the view, the shade and the quiet.
-Seeded from open data, finished by the people who actually sat there.
+A shared map of places worth stopping — a bench with the whole city in it,
+a flat rock above the cloud. Someone marks it with a photo or a short video,
+and everyone else gets to sit there too.
 
 </div>
 
@@ -13,32 +16,35 @@ Seeded from open data, finished by the people who actually sat there.
 
 ## What this is
 
-Not a social network about benches. A map of where a person can actually stop,
-with the attributes that decide whether a bench is worth walking to: a backrest,
-shade at two in the afternoon, a step-free approach, and something worth looking
-at.
+A mobile app, first. You open the map, see the spots people near you have
+marked, walk to one, and mark your own with a photo. Follow the people whose
+taste you trust and their finds show up in your feed.
 
-The bench-hunting community fills the map. **Rest routing** — planning a walk so
-you never go further than you can manage between places to sit — is the part
-people pay for.
+Benches are where it started, but a rock ledge on a ridge is a perch too, and
+hikers care about those more than park furniture. Five kinds of spot:
+**bench, viewpoint, trail rest, picnic table, shelter**.
 
-Read [`docs/STRATEGY.md`](docs/STRATEGY.md) before adding a feature. It contains
-a pre-committed kill criterion, and the reasoning for everything deliberately
-left out.
+Read [`docs/STRATEGY.md`](docs/STRATEGY.md) before adding a feature — it
+records what the idea was pressure-tested against, and which risks are being
+carried deliberately.
 
-## Stack
+## Layout
 
-| | |
-|---|---|
-| Framework | Next.js 15 (App Router), React 18, TypeScript |
-| Data | Supabase — Postgres + PostGIS, auth, storage |
-| Map | MapLibre GL with open vector tiles |
-| Styling | Hand-written CSS with design tokens. No utility framework |
-| Seed | OpenStreetMap via the Overpass API |
+This is an npm workspace with two apps over one shared core.
 
-Styling is deliberately plain CSS: the design system in
-[`app/globals.css`](app/globals.css) is the source of truth for both the app and
-the standalone page in `design/`, and neither needs a build step to render.
+```
+apps/mobile      Expo / React Native — the product
+apps/web         Next.js — marketing site + a browsable web map
+packages/core    Domain types and the brand tokens both apps read from
+supabase/        Postgres + PostGIS schema, RLS, storage buckets
+scripts/         OSM seeding, icon generation
+design/          Standalone landing page preview, logo studies
+docs/            Strategy, roadmap, brand
+```
+
+`packages/core` is the single source of truth for the palette and type scale.
+The web mirrors it as CSS custom properties in `apps/web/app/globals.css`;
+change one, change the other.
 
 ## Getting started
 
@@ -47,79 +53,69 @@ npm install
 cp .env.example .env.local
 ```
 
-Create a Supabase project, then paste its URL and keys into `.env.local`.
-
-Apply the schema — PostGIS, RLS policies, the rolling-average trigger and the
-`benches_nearby` lookup all live in one migration:
+Create a Supabase project and paste its URL and keys in. Then apply the schema
+— PostGIS, RLS, the counter triggers and the `spots_nearby` lookup all live in
+one migration:
 
 ```bash
-supabase db push
+npm run db:push
 ```
 
-Seed one city. **One.** Seeding the world is the mistake that makes every city
-equally empty:
+Seed one area's spots from OpenStreetMap. **One.** Seeding the world is the
+mistake that makes everywhere equally empty:
 
 ```bash
 npm run seed:osm
 ```
 
-Then:
+Seeded spots arrive as *hollow pins* — open data knows a bench exists, it does
+not know whether it is any good. They fill in as people mark them.
+
+### Run the app
 
 ```bash
-npm run dev
+npm run mobile
 ```
 
-The landing page is at `/`, the map at `/map`.
+Then press `i` or `a`, or scan the QR code with Expo Go. The app runs against
+sample marks until Supabase env vars are set, so it is explorable immediately.
 
-## Layout
+### Run the site
 
-```
-app/
-  globals.css        design system — tokens, bezels, motion
-  page.tsx           landing page
-  map/               the one screen
-components/
-  landing/           nav, footer, scroll reveal
-  map/               MapLibre canvas + bench sheet
-lib/
-  types.ts           Bench, Sit, the three axes
-  supabase/          browser and server clients
-supabase/
-  migrations/        schema, RLS, PostGIS lookup
-scripts/
-  seed-osm.ts        Overpass -> Postgres, idempotent on osm_id
-docs/
-  STRATEGY.md        the bet, the kill criterion, what is deferred and why
-  ROADMAP.md         phased so the cheap test happens before the costly build
-  BRAND.md           palette, type, motion, voice
-design/
-  preview.html       standalone landing page, no build required
+```bash
+npm run web
 ```
 
-## The three axes
+Landing page at `/`, web map at `/map`.
 
-Five stars tell you nothing about a bench. Perch rates three things, because
-three things decide whether it is worth the walk:
+## Icons
 
-**View** · **Shade** · **Comfort**
+Every icon — iOS, Android adaptive, splash, favicon — is generated from the one
+transparent master at `apps/web/public/logo.png`:
 
-Plus the attributes open data almost never carries: backrest, armrests,
-step-free approach, shaded at 2pm, water nearby, quiet.
+```bash
+npm run icons
+```
 
-## Before you add a feature
+## The data model
 
-The v1 scope excludes feeds, follows, comments, leaderboards, native apps, and
-every city but one. Each exclusion has a reason written down in
-`docs/STRATEGY.md`. If you are adding one of them back, the retention data
-should be the argument — not the roadmap.
+| | |
+|---|---|
+| **spots** | a place worth stopping. Position, kind, attributes |
+| **marks** | one person's photo or video of stopping there |
+| **saves** | somebody else wanting to go |
+| **follows** | whose finds land in your feed |
+
+Media lives on the **mark**, never on the spot, and it is required. A spot
+without a picture is just a pin, and pins are the part open data already has.
 
 ## Attribution
 
-Bench data © [OpenStreetMap](https://www.openstreetmap.org/copyright)
-contributors, licensed under **ODbL**. Attribution is a licence condition, not a
-courtesy: it must stay visible in the product and in any derived dataset.
+Base map data © [OpenStreetMap](https://www.openstreetmap.org/copyright)
+contributors, licensed **ODbL**. Attribution is a licence condition, not a
+courtesy — it stays visible in both apps.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE). Note that the MIT licence covers this source code
-only; the seeded bench data remains under ODbL.
+MIT — see [LICENSE](LICENSE). The MIT licence covers this source code only;
+seeded map data remains under ODbL.

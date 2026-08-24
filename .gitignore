@@ -38,3 +38,13 @@ yarn-error.log*
 
 # built by design/build-standalone.mjs
 design/preview.standalone.html
+
+# expo
+.expo/
+apps/mobile/.expo/
+dist/
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision

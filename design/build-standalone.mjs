@@ -21,20 +21,22 @@ const MIME = { webp: "image/webp", png: "image/png", jpg: "image/jpeg", svg: "im
 let html = await readFile(resolve(here, "preview.html"), "utf8");
 
 // 1. Inline the stylesheet.
-const css = await readFile(resolve(root, "app/globals.css"), "utf8");
+const css = await readFile(resolve(root, "apps/web/app/globals.css"), "utf8");
 html = html.replace(
-  /<link rel="stylesheet" href="\.\.\/app\/globals\.css" \/>/,
+  /<link rel="stylesheet" href="\.\.\/apps\/web\/app\/globals\.css" \/>/,
   `<style>\n${css}\n</style>`,
 );
 
 // 2. Inline every referenced image as a data: URI.
-const refs = [...new Set([...html.matchAll(/\.\.\/public\/([\w.-]+)/g)].map((m) => m[1]))];
+const refs = [
+  ...new Set([...html.matchAll(/\.\.\/apps\/web\/public\/([\w.-]+)/g)].map((m) => m[1])),
+];
 
 for (const file of refs) {
-  const bytes = await readFile(resolve(root, "public", file));
+  const bytes = await readFile(resolve(root, "apps/web/public", file));
   const ext = file.split(".").pop().toLowerCase();
   const uri = `data:${MIME[ext] ?? "application/octet-stream"};base64,${bytes.toString("base64")}`;
-  html = html.replaceAll(`../public/${file}`, uri);
+  html = html.replaceAll(`../apps/web/public/${file}`, uri);
   console.log(`  inlined ${file} (${(bytes.length / 1024).toFixed(0)} KB)`);
 }
 
