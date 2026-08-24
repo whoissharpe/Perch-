@@ -3,7 +3,15 @@ import { useColorScheme } from "react-native";
 import maplibregl, { type Map as MapLibreMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { palette } from "@perch/core";
-import { LANDING, LANDING_MS, PERCH_ZOOM, birdUri, type BirdTint } from "@/birdSprites";
+import {
+  BIRD_ZOOM,
+  LANDING,
+  LANDING_MS,
+  PERCH_ZOOM,
+  birdUri,
+  pinScale,
+  type BirdTint,
+} from "@/birdSprites";
 import type { MapCanvasProps } from "./MapCanvas";
 
 const STYLE = "https://tiles.openfreemap.org/styles/positron";
@@ -32,6 +40,7 @@ interface Pin {
   marked: boolean;
   el: HTMLDivElement;
   inner: HTMLDivElement;
+  dot: HTMLDivElement;
   bird: HTMLImageElement;
   mark: HTMLImageElement;
   open: HTMLImageElement;
@@ -91,11 +100,17 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
     ro.observe(host.current);
     resizeObs.current = ro;
 
-    // Land or take off as the zoom crosses the threshold.
     m.on("zoom", () => {
-      const shouldPerch = m.getZoom() >= PERCH_ZOOM;
+      const z = m.getZoom();
+      const shouldPerch = z >= PERCH_ZOOM;
+
       pins.current.forEach((p, i) => {
-        if (!p.marked || p.perched === shouldPerch) return;
+        if (!p.marked) return;
+
+        // Dot at city scale, bird above it — keeps them from colliding.
+        applyZoom(p, z);
+
+        if (p.perched === shouldPerch) return;
         p.perched = shouldPerch;
         // An open bird keeps its wings out; it re-settles when deselected.
         if (p.selected) return;
@@ -195,13 +210,29 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
       const mark = layer();
       const open = layer();
 
+      // The far-out representation: a small solid dot, so a city full of
+      // spots reads as a scatter of points rather than a pile of birds.
+      const dot = document.createElement("div");
+      Object.assign(dot.style, {
+        position: "absolute",
+        left: "50%",
+        bottom: "0",
+        width: "11px",
+        height: "11px",
+        marginLeft: "-5.5px",
+        borderRadius: "50%",
+        background: c.blaze,
+        boxShadow: `0 0 0 4px ${c.blaze}33`,
+        opacity: "0",
+        pointerEvents: "none",
+        transition: "opacity .2s linear",
+      });
+
       if (marked) {
         bird.src = birdUri(tint, "perched");
         mark.src = birdUri(tint, "mark");
         open.src = birdUri(tint, "open");
-        bird.style.opacity = perched ? "0" : "1";
-        mark.style.opacity = perched ? "1" : "0";
-        inner.append(bird, mark, open);
+        inner.append(bird, mark, open, dot);
       }
 
       el.addEventListener("click", (ev) => {
@@ -216,6 +247,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         marked,
         el,
         inner,
+        dot,
         bird,
         mark,
         open,
@@ -235,7 +267,13 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
           .addTo(m),
       );
     });
-  }, [spots, onSelect, c.pine, tint]);
+
+    // Draw each new pin at whatever zoom the map is already at.
+    const z = m.getZoom();
+    pins.current.forEach((p) => {
+      if (p.marked) applyZoom(p, z);
+    });
+  }, [spots, onSelect, c.pine, c.blaze, tint]);
 
   /* Selection, applied by mutation so nothing is torn down. */
   const selectedRef = useRef<string | null>(selectedId);
@@ -248,7 +286,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
       if (p.selected === on) return;
       p.selected = on;
 
-      p.inner.style.transform = on ? "scale(1.5)" : "scale(1)";
+      const z = map.current?.getZoom() ?? PERCH_ZOOM;
 
       if (on) {
         // Wings wide, facing you — the tell for which post is open below.
@@ -256,11 +294,10 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         p.bird.style.opacity = "0";
         p.mark.style.opacity = "0";
       } else {
-        // Back to wings closed on the bench, or just the bird if zoomed out.
         p.open.style.opacity = "0";
-        p.bird.style.opacity = p.perched ? "0" : "1";
-        p.mark.style.opacity = p.perched ? "1" : "0";
       }
+      // Restores the dot / bird / bench state and the zoom-appropriate size.
+      applyZoom(p, z);
     });
   }, [selectedId]);
 
@@ -296,8 +333,48 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
   }, [me, follow]);
 
   return (
-    <div ref={host} style={{ position: "absolute", inset: 0, background: c.sunk }} />
+    <div
+      ref={host}
+      style={{
+        position: "absolute",
+        inset: 0,
+        background: c.sunk,
+        // MapLibre positions markers as absolutely placed siblings of the
+        // canvas and does not clip them to the container. Without this, pins
+        // near the edge paint outside the map and spill down the sides.
+        overflow: "hidden",
+      }}
+    />
   );
+}
+
+/**
+ * Sets how a pin draws at the current zoom.
+ *
+ * Far out it is a dot; closer it becomes the bird; closer still the landing
+ * runs and it gains a bench. A 76px bird at city scale collides with its
+ * neighbours into an unreadable pile, which is what this steps around.
+ */
+function applyZoom(pin: Pin, zoom: number) {
+  const far = zoom < BIRD_ZOOM;
+  const s = pinScale(zoom) * (pin.selected ? 1.5 : 1);
+  pin.inner.style.transform = `scale(${s.toFixed(3)})`;
+
+  if (pin.selected) {
+    pin.dot.style.opacity = "0";
+    return;
+  }
+
+  pin.dot.style.opacity = far ? "1" : "0";
+
+  if (far) {
+    pin.bird.style.opacity = "0";
+    pin.mark.style.opacity = "0";
+    pin.open.style.opacity = "0";
+  } else {
+    pin.bird.style.opacity = pin.perched ? "0" : "1";
+    pin.mark.style.opacity = pin.perched ? "1" : "0";
+  }
 }
 
 /** Swoop, two wingbeats, settle — then the bench arrives underneath. */

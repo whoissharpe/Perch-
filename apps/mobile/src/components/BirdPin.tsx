@@ -13,11 +13,17 @@ export function BirdPin({
   perched,
   selected,
   index,
+  scale,
+  far,
 }: {
   tint: BirdTint;
   perched: boolean;
   selected: boolean;
   index: number;
+  /** Size at the current zoom, as a fraction of the full pin. */
+  scale: number;
+  /** Too far out for a bird to read — draw a dot instead. */
+  far: boolean;
 }) {
   const [pose, setPose] = useState<BirdPose>("perched");
   const lift = useRef(new Animated.Value(0)).current;
@@ -82,12 +88,27 @@ export function BirdPin({
   }, [perched, index, lift, benchIn, birdOut]);
 
   const size = 76;
+  const showDot = far && !selected;
+
+  if (showDot) {
+    // A 76px bird at city scale collides with its neighbours into an
+    // unreadable pile, so far out each spot is just a point.
+    return (
+      <View style={styles.dotWrap}>
+        <View style={[styles.dot, { backgroundColor: BLAZE }]} />
+      </View>
+    );
+  }
 
   return (
     <View
       style={[
         styles.wrap,
-        { width: size, height: size, transform: [{ scale: selected ? 1.5 : 1 }] },
+        {
+          width: size,
+          height: size,
+          transform: [{ scale: scale * (selected ? 1.5 : 1) }],
+        },
       ]}
     >
       {/* the flying / standing bird */}
@@ -118,7 +139,11 @@ export function BirdPin({
   );
 }
 
+const BLAZE = "#e1622f";
+
 const styles = StyleSheet.create({
   wrap: { alignItems: "center", justifyContent: "center" },
+  dotWrap: { width: 22, height: 22, alignItems: "center", justifyContent: "center" },
+  dot: { width: 11, height: 11, borderRadius: 5.5 },
   img: { width: "100%", height: "100%" },
 });

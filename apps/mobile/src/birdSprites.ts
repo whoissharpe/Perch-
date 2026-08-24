@@ -56,3 +56,20 @@ export const LANDING_MS = 640;
 
 /** Past this zoom the bench is legible, so the bird gets something to sit on. */
 export const PERCH_ZOOM = 15.5;
+
+/**
+ * Below this, spots are drawn as small dots.
+ *
+ * A 76px bird is sized for standing next to a bench. At city scale there are
+ * dozens on screen and they collide into an unreadable pile, so the map steps
+ * down: dot -> bird -> bird on a bench.
+ */
+export const BIRD_ZOOM = 14;
+
+/** How big the pin is at a given zoom, as a fraction of PIN_SIZE. */
+export function pinScale(zoom: number): number {
+  if (zoom >= PERCH_ZOOM) return 1;
+  if (zoom <= BIRD_ZOOM) return 0.5;
+  const t = (zoom - BIRD_ZOOM) / (PERCH_ZOOM - BIRD_ZOOM);
+  return 0.5 + t * 0.5;
+}
