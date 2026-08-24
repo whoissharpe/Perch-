@@ -1,0 +1,40 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next
+.next/
+out/
+build/
+next-env.d.ts
+
+# env
+.env
+.env.local
+.env*.local
+
+# supabase
+.branches
+.temp
+supabase/.temp/
+
+# osm seed dumps (large, regenerate with npm run seed:osm)
+data/*.json
+data/*.geojson
+!data/.gitkeep
+
+# misc
+.DS_Store
+Thumbs.db
+*.pem
+npm-debug.log*
+yarn-error.log*
+.vercel
+*.tsbuildinfo
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# built by design/build-standalone.mjs
+design/preview.standalone.html

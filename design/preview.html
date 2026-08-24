@@ -1,0 +1,363 @@
+<title>Perch</title>
+<meta name="description" content="A map of the world's best places to sit down." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="../app/globals.css" />
+
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav-shell">
+  <nav class="nav-island" aria-label="Primary">
+    <a class="wordmark" href="#" aria-label="Perch, home">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="5.4" r="2.1" />
+        <path d="M3.6 12.6h16.8" />
+        <path d="M6.4 12.6v6.2M17.6 12.6v6.2" />
+        <path d="M5.4 16.2h13.2" />
+      </svg>
+      <span>Perch</span>
+    </a>
+    <div class="nav-links">
+      <a class="link" href="#how">How it works</a>
+      <a class="link" href="#rest">The rest layer</a>
+      <a class="link" href="#pricing">Pricing</a>
+    </div>
+    <a class="btn btn--primary btn--sm" href="#waitlist">
+      Join the waitlist
+      <span class="btn__well" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </a>
+  </nav>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="shell">
+      <div class="hero__head reveal">
+        <span class="eyebrow">Lisbon first &middot; seeded from OpenStreetMap</span>
+        <h1 class="display d-hero mt-md">Every good place<br /><em class="italic-swap">to sit down.</em></h1>
+        <p class="lede mt-md">Not every bench. The ones with the view, the shade and the quiet &mdash; rated by the people who actually sat there.</p>
+        <div class="row wrap gap-sm mt-lg">
+          <a class="btn btn--primary" href="#waitlist">Join the waitlist
+            <span class="btn__well" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+          <a class="btn btn--ghost" href="#">Open the Lisbon map
+            <span class="btn__well" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero__plate reveal" style="--i:1">
+      <div class="shell">
+        <div class="bezel">
+          <div class="bezel__core hero__frame">
+            <img src="../public/hero-overlook.webp" width="2752" height="1536" alt="A weathered wooden bench on a stone terrace, looking down over a terracotta-roofed coastal old town at golden hour." />
+          </div>
+        </div>
+
+        <aside class="bench-card" aria-label="Example bench rating">
+          <div class="row gap-xs" style="justify-content:space-between">
+            <span class="meta">Miradouro terrace</span>
+            <span class="meta">38.7139, &minus;9.1394</span>
+          </div>
+          <p class="bench-card__name">The one with the whole city in it</p>
+          <dl class="axes">
+            <div class="axis"><dt>View</dt><dd><span class="dots" aria-label="5 out of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></dd></div>
+            <div class="axis"><dt>Shade</dt><dd><span class="dots" aria-label="2 out of 5"><i class="on"></i><i class="on"></i><i></i><i></i><i></i></span></dd></div>
+            <div class="axis"><dt>Comfort</dt><dd><span class="dots" aria-label="4 out of 5"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></dd></div>
+          </dl>
+          <div class="bench-card__foot">
+            <span class="tag tag--moss">Backrest</span>
+            <span class="tag">Step-free approach</span>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </section>
+
+  <!-- FACT STRIP -->
+  <section class="strip">
+    <div class="shell">
+      <ul class="strip__list">
+        <li class="reveal" style="--i:0"><h3 class="strip__title">Three axes</h3><p class="body-muted">View, shade, comfort. Not five meaningless stars.</p></li>
+        <li class="reveal" style="--i:1"><h3 class="strip__title">Open data</h3><p class="body-muted">Seeded from OpenStreetMap, ODbL. Never an empty map.</p></li>
+        <li class="reveal" style="--i:2"><h3 class="strip__title">One city</h3><p class="body-muted">Lisbon, properly. Then wherever you are.</p></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- REST LAYER -->
+  <section class="section" id="rest">
+    <div class="shell">
+      <div class="split">
+        <div class="split__lead reveal">
+          <span class="eyebrow">The thesis</span>
+          <h2 class="display d-1 mt-md">A bench is not the point.<br /><em class="italic-swap">Stopping is.</em></h2>
+        </div>
+        <div class="split__body reveal" style="--i:1">
+          <p class="lede">Nobody has ever wanted a bench. They wanted to stop walking.</p>
+          <p class="body-muted mt-md">Which is why the interesting map is not &ldquo;where are the benches&rdquo; &mdash; open data mostly answers that already. It is <em>where can a person actually stop</em>: with a back to lean on, shade at two in the afternoon, a step-free approach, and something worth looking at.</p>
+          <p class="body-muted mt-md">Those attributes exist almost nowhere. That is the gap Perch fills, and the reason the map gets more valuable every time somebody sits down.</p>
+          <div class="quiet-stats mt-lg">
+            <div><span class="quiet-stats__n">2bn</span><span class="body-muted">people over 60 by 2050, most of whom plan a walk around where they can rest.</span></div>
+            <div><span class="quiet-stats__n">0</span><span class="body-muted">major mapping products that will route you along a path with places to sit.</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- BENTO -->
+  <section class="section" id="features" style="padding-top:0">
+    <div class="shell">
+      <div class="bento bento--wide-left">
+        <article class="bezel bezel--interactive reveal">
+          <div class="bezel__core card-photo">
+            <img src="../public/bench-plaza.webp" width="2400" height="1792" loading="lazy" alt="A bench under a large plane tree, dappled light falling across mosaic paving." />
+            <div class="pad-lg">
+              <span class="eyebrow eyebrow--plain">Never empty</span>
+              <h3 class="display d-2 mt-sm">The map arrives full</h3>
+              <p class="body-muted mt-sm">Day one, every bench OpenStreetMap knows about is already on it. You are not asked to build a database before the product does anything for you &mdash; you are asked to tell us which ones are good.</p>
+            </div>
+          </div>
+        </article>
+
+        <article class="bezel bezel--interactive reveal" style="--i:1">
+          <div class="bezel__core pad-lg">
+            <h3 class="display d-2">Rate what matters</h3>
+            <p class="body-muted mt-sm">Three axes, because three things decide whether a bench is worth walking to.</p>
+            <dl class="axes mt-md">
+              <div class="axis"><dt>View</dt><dd><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></span></dd></div>
+              <div class="axis"><dt>Shade</dt><dd><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></span></dd></div>
+              <div class="axis"><dt>Comfort</dt><dd><span class="dots"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></dd></div>
+            </dl>
+          </div>
+        </article>
+
+        <article class="bezel bezel--interactive reveal" style="--i:2">
+          <div class="bezel__core pad-lg">
+            <h3 class="display d-2">Collections</h3>
+            <p class="body-muted mt-sm">Sequences worth walking. Built by people who live there, not generated from a template.</p>
+            <ul class="collection-list mt-md">
+              <li><span>Sunset benches, Alfama</span><span class="meta">11</span></li>
+              <li><span>Shade at 2pm, Baixa</span><span class="meta">18</span></li>
+              <li><span>Step-free river walk</span><span class="meta">7</span></li>
+            </ul>
+          </div>
+        </article>
+
+        <article class="bezel bezel--interactive reveal" style="--i:3">
+          <div class="bezel__core pad-lg">
+            <h3 class="display d-2">Offline</h3>
+            <p class="body-muted mt-sm">The map you need when you are tired is the one that works with two bars and 4% battery.</p>
+          </div>
+        </article>
+
+        <article class="bezel bezel--interactive reveal" style="--i:4">
+          <div class="bezel__core pad-lg">
+            <h3 class="display d-2">Add what the data misses</h3>
+            <p class="body-muted mt-sm">Open data knows a bench exists. It rarely knows whether it has a backrest, an armrest to push up from, or a kerb in the way. One tap each, and the map becomes something no satellite can produce.</p>
+            <div class="row wrap gap-xs mt-md">
+              <span class="tag">Backrest</span><span class="tag">Armrests</span><span class="tag">Step-free</span><span class="tag">Shaded 2pm</span><span class="tag">Water nearby</span><span class="tag">Quiet</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="section" id="how">
+    <div class="shell">
+      <div class="reveal" style="max-width:40ch">
+        <span class="eyebrow">How it works</span>
+        <h2 class="display d-1 mt-md">Three taps, then you sit.</h2>
+      </div>
+      <ol class="steps mt-xl">
+        <li class="reveal" style="--i:0"><span class="steps__n">01</span><h3 class="display d-2">Find one near you</h3><p class="body-muted mt-sm">Open the map. Everything within a short walk is already there, with whatever is known about it.</p></li>
+        <li class="reveal" style="--i:1"><span class="steps__n">02</span><h3 class="display d-2">Sit down</h3><p class="body-muted mt-sm">This is the part the app cannot help with. It is also the point.</p></li>
+        <li class="reveal" style="--i:2"><span class="steps__n">03</span><h3 class="display d-2">Say if it was any good</h3><p class="body-muted mt-sm">Three dots for view, shade and comfort. A photo if the light was doing something. Ten seconds.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ACCESSIBILITY -->
+  <section class="section band" id="access">
+    <div class="shell">
+      <div class="feature-split">
+        <div class="bezel reveal">
+          <div class="bezel__core">
+            <img src="../public/bench-coast.webp" width="2400" height="1792" loading="lazy" alt="A plain wooden bench alone on a coastal clifftop path at dusk, facing calm water." />
+          </div>
+        </div>
+        <div class="reveal" style="--i:1">
+          <span class="eyebrow">Rest routing</span>
+          <h2 class="display d-1 mt-md">&ldquo;Can I make it<br /><em class="italic-swap">that far?&rdquo;</em></h2>
+          <p class="body-muted mt-md">For a lot of people that question decides whether they leave the house. Bad knees, a heart condition, a late pregnancy, eighty-three years old. The distance between places to sit is the difference between a walk and a day indoors.</p>
+          <p class="body-muted mt-md">Perch Pro plans a route by rest, not by speed &mdash; never more than your chosen distance between one bench and the next, with the step-free approaches marked. It is the feature this whole map is really for.</p>
+          <a class="btn btn--ghost mt-lg" href="#pricing">See what Pro costs
+            <span class="btn__well" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="section" id="pricing">
+    <div class="shell">
+      <div class="reveal" style="max-width:42ch">
+        <span class="eyebrow">Pricing</span>
+        <h2 class="display d-1 mt-md">Free to sit. Pay to plan.</h2>
+        <p class="body-muted mt-md">No ads on a map about quiet places. The people who need rest routing are the people who will pay for it.</p>
+      </div>
+
+      <div class="prices mt-xl">
+        <div class="bezel reveal">
+          <div class="bezel__core pad-lg stack">
+            <span class="meta">Perch</span>
+            <p class="price">Free</p>
+            <p class="body-muted">Forever. This is the part that fills the map.</p>
+            <ul class="ticks mt-md">
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>The whole map</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Rate and photograph any bench</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Follow people and collections</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Add missing benches and attributes</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="bezel bezel--feature reveal" style="--i:1">
+          <div class="bezel__core pad-lg stack">
+            <div class="row gap-xs" style="justify-content:space-between">
+              <span class="meta">Perch Pro</span>
+              <span class="tag tag--moss">Launch price</span>
+            </div>
+            <p class="price">&euro;3.50<span class="price__per">/month</span></p>
+            <p class="body-muted">Or &euro;29 a year. Cancel in two taps.</p>
+            <ul class="ticks mt-md">
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Rest routing &mdash; never walk further than you can</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Offline maps for the whole city</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Shade forecasting by time of day</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Private collections and saved walks</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Step-free approach filters</li>
+            </ul>
+            <a class="btn btn--primary mt-lg" href="#waitlist">Join the waitlist
+              <span class="btn__well" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </a>
+          </div>
+        </div>
+
+        <div class="bezel reveal" style="--i:2">
+          <div class="bezel__core pad-lg stack">
+            <span class="meta">For cities</span>
+            <p class="price">Later</p>
+            <p class="body-muted">Parks departments and heat officers keep asking where people can rest in shade. We will have the answer before we sell it &mdash; not the other way round.</p>
+            <ul class="ticks mt-md">
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Rest-point inventories</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Shade gap analysis</li>
+              <li><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 8.5l3.2 3.2L13 5" stroke-linecap="round" stroke-linejoin="round"/></svg>Accessibility audit exports</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DEDICATIONS -->
+  <section class="section band" id="dedications">
+    <div class="shell">
+      <div class="feature-split feature-split--flip">
+        <div class="reveal">
+          <span class="eyebrow">Memorial benches</span>
+          <h2 class="display d-1 mt-md">Handled carefully,<br /><em class="italic-swap">or not at all.</em></h2>
+          <p class="body-muted mt-md">A plaque on a bench is the most-read piece of writing most people ever leave behind. Perch will show you where they are and let families add the story the brass had no room for.</p>
+          <p class="body-muted mt-md">What Perch will never do is sell you a claim on a bench it does not own. Dedications are council property under a real contract with a real family. We build this <em>with</em> parks departments, on their terms, or we do not build it.</p>
+          <p class="meta mt-lg">Not in v1. Documented so it is not quietly forgotten.</p>
+        </div>
+        <div class="bezel reveal" style="--i:1">
+          <div class="bezel__core">
+            <img src="../public/bench-memorial.webp" width="2400" height="1792" loading="lazy" alt="A weathered park bench with a small blank brass plaque set into the top rail, in early morning light." />
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- WAITLIST -->
+  <section class="section" id="waitlist">
+    <div class="shell">
+      <div class="bezel reveal">
+        <div class="bezel__core cta">
+          <span class="eyebrow">Lisbon, then everywhere</span>
+          <h2 class="display d-1 mt-md">Tell us your city.<br /><em class="italic-swap">We will start there next.</em></h2>
+          <form class="waitlist-form mt-lg" onsubmit="return false;">
+            <label class="sr-only" for="email">Email address</label>
+            <input id="email" name="email" type="email" placeholder="you@example.com" autocomplete="email" />
+            <label class="sr-only" for="city">City</label>
+            <input id="city" name="city" type="text" placeholder="Your city" />
+            <button class="btn btn--primary" type="submit">Join
+              <span class="btn__well" aria-hidden="true"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M4 12L12 4M12 4H6M12 4v6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+            </button>
+          </form>
+          <p class="meta mt-md">One email when your city opens. Nothing else.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="shell">
+    <div class="footer__top">
+      <div class="stack gap-sm">
+        <a class="wordmark" href="#" aria-label="Perch, home">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true">
+            <circle cx="12" cy="5.4" r="2.1" /><path d="M3.6 12.6h16.8" /><path d="M6.4 12.6v6.2M17.6 12.6v6.2" /><path d="M5.4 16.2h13.2" />
+          </svg>
+          <span>Perch</span>
+        </a>
+        <p class="body-muted" style="max-width:34ch">A map of the world&rsquo;s best places to sit down. Built in the open, seeded from open data.</p>
+      </div>
+      <div class="footer__cols">
+        <div class="stack gap-xs">
+          <span class="meta">Product</span>
+          <a class="link" href="#how">How it works</a>
+          <a class="link" href="#rest">The rest layer</a>
+          <a class="link" href="#pricing">Pricing</a>
+        </div>
+        <div class="stack gap-xs">
+          <span class="meta">Project</span>
+          <a class="link" href="#">Repository</a>
+          <a class="link" href="#waitlist">Waitlist</a>
+          <a class="link" href="#dedications">Dedications</a>
+        </div>
+      </div>
+    </div>
+    <hr class="rule mt-xl" />
+    <div class="footer__bottom">
+      <span class="meta">Bench data &copy; OpenStreetMap contributors, ODbL</span>
+      <span class="meta">Lisbon &middot; 2026</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    var nodes = Array.prototype.slice.call(document.querySelectorAll(".reveal"));
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches || !("IntersectionObserver" in window)) {
+      nodes.forEach(function (n) { n.classList.add("is-in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-in");
+        io.unobserve(entry.target);
+      });
+    }, { rootMargin: "0px 0px -12% 0px", threshold: 0.08 });
+    nodes.forEach(function (n) { io.observe(n); });
+  })();
+</script>
