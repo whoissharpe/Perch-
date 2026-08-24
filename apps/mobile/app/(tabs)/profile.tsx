@@ -1,13 +1,18 @@
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
+import { useAuth } from "@/auth";
 import { SAMPLE_MARKS } from "@/sample";
 import { SpotCard } from "@/components/SpotCard";
 
 export default function ProfileScreen() {
   const c = useTheme();
   const insets = useSafeAreaInsets();
+  const router = useRouter();
+  const { canPost, handle, demo, signOut } = useAuth();
+
   const mine = SAMPLE_MARKS.slice(0, 2);
 
   return (
@@ -27,67 +32,58 @@ export default function ProfileScreen() {
           contentFit="contain"
         />
         <View style={{ flex: 1 }}>
-          <Text style={[type.title, { color: c.ink }]}>@you</Text>
-          <Text style={[type.small, { color: c.muted, marginTop: 2 }]}>
-            Joined this week
+          <Text style={[type.title, { color: c.ink }]}>
+            {canPost ? `@${handle}` : "Not signed in"}
+          </Text>
+          <Text style={[type.small, { color: c.muted }]}>
+            {demo
+              ? "Demo mode — sample spots"
+              : canPost
+                ? `${mine.length} spots marked`
+                : "Sign in to mark spots and follow people"}
           </Text>
         </View>
       </View>
 
-      <View style={[styles.stats, { borderColor: c.line }]}>
-        {[
-          ["2", "Marked"],
-          ["4", "Saved"],
-          ["11", "Following"],
-        ].map(([n, label]) => (
-          <View key={label} style={{ flex: 1 }}>
-            <Text style={[type.title, { color: c.ink }]}>{n}</Text>
-            <Text style={[type.meta, { color: c.muted, marginTop: 2 }]}>
-              {label.toUpperCase()}
-            </Text>
+      {canPost ? (
+        <Pressable onPress={signOut} style={[styles.btn, { borderColor: c.line }]}>
+          <Text style={[type.body, { color: c.ink }]}>Sign out</Text>
+        </Pressable>
+      ) : (
+        <Pressable
+          onPress={() => router.push("/sign-in")}
+          style={[styles.btn, { backgroundColor: c.pine, borderColor: c.pine }]}
+        >
+          <Text style={[type.body, { color: c.onPine, fontWeight: "600" }]}>
+            Sign in
+          </Text>
+        </Pressable>
+      )}
+
+      {canPost && (
+        <>
+          <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>
+            Your marks
+          </Text>
+          <View style={{ gap: space.sm, marginTop: space.sm }}>
+            {mine.map((m) => (
+              <SpotCard key={m.id} mark={m} />
+            ))}
           </View>
-        ))}
-      </View>
-
-      <View
-        style={[
-          styles.pro,
-          { backgroundColor: c.pineSoft, borderColor: "transparent" },
-        ]}
-      >
-        <Text style={[type.cardTitle, { color: c.pine }]}>Perch Pro</Text>
-        <Text style={[type.small, { color: c.body, marginTop: 4 }]}>
-          Offline maps, rest routing and shade by time of day. €3.50 a month,
-          free for 30 days.
-        </Text>
-      </View>
-
-      <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>
-        Your marks
-      </Text>
-      <View style={{ gap: space.md, marginTop: space.sm }}>
-        {mine.map((m) => (
-          <SpotCard key={m.id} mark={m} />
-        ))}
-      </View>
+        </>
+      )}
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   head: { flexDirection: "row", alignItems: "center", gap: space.sm },
-  mark: { width: 54, height: 54 },
-  stats: {
-    flexDirection: "row",
-    marginTop: space.lg,
-    paddingVertical: space.md,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-  },
-  pro: {
-    marginTop: space.lg,
-    padding: space.md,
-    borderRadius: radius.md,
+  mark: { width: 56, height: 56 },
+  btn: {
+    marginTop: space.md,
+    paddingVertical: 13,
+    borderRadius: radius.pill,
     borderWidth: 1,
+    alignItems: "center",
   },
 });

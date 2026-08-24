@@ -48,3 +48,6 @@ dist/
 *.p12
 *.key
 *.mobileprovision
+dist-web/
+dist-android/
+apps/mobile/dist*/

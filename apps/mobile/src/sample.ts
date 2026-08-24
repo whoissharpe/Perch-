@@ -19,6 +19,9 @@ export interface SampleMark {
   marks: number;
 }
 
+const IMG = (id: string) =>
+  `https://d8j0ntlcm91z4.cloudfront.net/user_3GGqBW4zpaaDAVr4CQwHyT8geRQ/${id}`;
+
 export const SAMPLE_MARKS: SampleMark[] = [
   {
     id: "1",
@@ -45,7 +48,7 @@ export const SAMPLE_MARKS: SampleMark[] = [
     who: "fellrunner",
     caption: "Forty minutes up from the car park. Worth every one of them.",
     saves: 168,
-    isVideo: true,
+    isVideo: false,
     marks: 7,
   },
   {
@@ -87,7 +90,7 @@ export const SAMPLE_MARKS: SampleMark[] = [
     who: "hollyfoot",
     caption: "Fog came in ten minutes after I sat down. Stayed anyway.",
     saves: 143,
-    isVideo: true,
+    isVideo: false,
     marks: 3,
   },
   {
@@ -103,5 +106,73 @@ export const SAMPLE_MARKS: SampleMark[] = [
     saves: 58,
     isVideo: false,
     marks: 6,
+  },
+
+  // A denser cluster around the default centre, so the map has something to
+  // show before any real data exists.
+  {
+    id: "7",
+    name: "Two benches facing each other",
+    kind: "bench",
+    lat: 38.7191,
+    lng: -9.1421,
+    image: IMG("hf_20260824_164312_b636ebfc-0488-4d25-bc4a-38d8b85d0fde_min.webp"),
+    who: "marta.r",
+    caption: "Good for an argument you want to finish sitting down.",
+    saves: 34,
+    isVideo: false,
+    marks: 2,
+  },
+  {
+    id: "8",
+    name: "Wall by the tram stop",
+    kind: "trail_rest",
+    lat: 38.7247,
+    lng: -9.1338,
+    image: IMG("hf_20260824_164312_1c54099f-193a-4961-a785-be26af776441_min.webp"),
+    who: "ade.walks",
+    caption: "Not a bench but everyone sits on it anyway.",
+    saves: 61,
+    isVideo: false,
+    marks: 5,
+  },
+  {
+    id: "9",
+    name: "Shade at two in the afternoon",
+    kind: "bench",
+    lat: 38.7164,
+    lng: -9.1489,
+    image: IMG("hf_20260824_164312_2173926a-6f55-47b7-a55d-a0924c2a569c_min.webp"),
+    who: "j.okonkwo",
+    caption: "The only shaded one on this whole stretch.",
+    saves: 88,
+    isVideo: false,
+    marks: 4,
+  },
+  {
+    id: "10",
+    name: "Steps above the square",
+    kind: "viewpoint",
+    lat: 38.7269,
+    lng: -9.1447,
+    image: IMG("hf_20260824_164312_0ec2b755-dd79-4817-a7a7-b96bdaa0b9e2_min.webp"),
+    who: "hollyfoot",
+    caption: "Sit on the third step up. Any higher and you lose the river.",
+    saves: 112,
+    isVideo: false,
+    marks: 8,
+  },
+  {
+    id: "11",
+    name: "Bench nobody uses",
+    kind: "bench",
+    lat: 38.7118,
+    lng: -9.1352,
+    image: IMG("hf_20260824_164312_677fa363-cac0-4752-98de-f4409353446c_min.webp"),
+    who: "tomaslx",
+    caption: "Faces a wall. Still quiet, still yours.",
+    saves: 19,
+    isVideo: false,
+    marks: 1,
   },
 ];

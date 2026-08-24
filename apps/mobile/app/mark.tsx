@@ -16,11 +16,13 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { SPOT_KINDS, SPOT_ATTRIBUTES, formatCoords, type SpotKind } from "@perch/core";
 import { useTheme, type, radius, space } from "@/theme";
 import { Icon } from "@/components/Icon";
+import { useAuth } from "@/auth";
 
 export default function MarkScreen() {
   const c = useTheme();
   const router = useRouter();
   const insets = useSafeAreaInsets();
+  const { canPost } = useAuth();
 
   const [media, setMedia] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null);
@@ -28,6 +30,12 @@ export default function MarkScreen() {
   const [caption, setCaption] = useState("");
   const [kind, setKind] = useState<SpotKind>("bench");
   const [attrs, setAttrs] = useState<string[]>([]);
+
+  // Posting needs an account so people can follow you. Bounce to sign-in
+  // rather than letting someone fill the whole form and fail at the end.
+  useEffect(() => {
+    if (!canPost) router.replace("/sign-in");
+  }, [canPost, router]);
 
   // Grab the position as soon as the sheet opens — by the time somebody has
   // framed the photo, the fix has settled.
@@ -58,10 +66,12 @@ export default function MarkScreen() {
       return;
     }
 
+    // Photos only for now. Video is planned, but it drags in transcoding,
+    // upload size limits and a much bigger moderation surface — none of which
+    // the first version needs to prove the loop.
     const opts: ImagePicker.ImagePickerOptions = {
-      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.85,
-      videoMaxDuration: 15,
       allowsEditing: false,
     };
 

@@ -86,6 +86,92 @@ await render({ out: M("assets/splash.png"), size: 1284, background: PAPER, padRa
 await render({ out: W("icon.png"), size: 512, background: CLEAR, padRatio: 0.06 });
 await render({ out: W("apple-icon.png"), size: 180, background: PAPER, padRatio: 0.12 });
 
+// In-app marks: transparent, so the logo can sit on any surface. Two tints,
+// because pine disappears on the dark ground and paper disappears on light.
+await render({ out: M("assets/mark-pine.png"), size: 320, background: CLEAR, padRatio: 0.02, tint: PINE });
+await render({ out: M("assets/mark-paper.png"), size: 320, background: CLEAR, padRatio: 0.02, tint: PAPER });
+
+/* ---------- landing-animation sprites ---------- */
+
+/** Tightest rectangle containing any non-transparent pixel. */
+function alphaBounds(data, width, height) {
+  let top = height, left = width, right = -1, bottom = -1;
+
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      if (data[(y * width + x) * 4 + 3] > 8) {
+        if (y < top) top = y;
+        if (y > bottom) bottom = y;
+        if (x < left) left = x;
+        if (x > right) right = x;
+      }
+    }
+  }
+  return { left, top, right, bottom };
+}
+
+/**
+ * Crop every pose to ONE shared bounding box — the union of all three — then
+ * scale. Cropping each pose to its own content would resize and reposition the
+ * bird between frames and the landing would jitter; sharing the box removes the
+ * dead margin (so the bird is actually big enough to see) while keeping the
+ * frames in register.
+ */
+const POSES = ["perched", "up", "spread"];
+const raws = [];
+
+for (const pose of POSES) {
+  const { data, info } = await sharp(M(`assets/bird-${pose}-raw.png`))
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+  raws.push({ pose, data, info, bounds: alphaBounds(data, info.width, info.height) });
+}
+
+const union = raws.reduce((a, r) => ({
+  left: Math.min(a.left, r.bounds.left),
+  top: Math.min(a.top, r.bounds.top),
+  right: Math.max(a.right, r.bounds.right),
+  bottom: Math.max(a.bottom, r.bounds.bottom),
+}), raws[0].bounds);
+
+const region = {
+  left: union.left,
+  top: union.top,
+  width: union.right - union.left + 1,
+  height: union.bottom - union.top + 1,
+};
+
+console.log(`  shared sprite box ${region.width}×${region.height} at ${region.left},${region.top}`);
+
+const SPRITE = 320;
+
+for (const { pose, data, info } of raws) {
+  for (const [name, tint] of [["pine", PINE], ["paper", PAPER]]) {
+    const tinted = Buffer.from(data);
+    for (let i = 0; i < tinted.length; i += 4) {
+      if (tinted[i + 3] > 0) {
+        tinted[i] = tint.r;
+        tinted[i + 1] = tint.g;
+        tinted[i + 2] = tint.b;
+      }
+    }
+
+    const out = M(`assets/bird-${pose}-${name}.png`);
+    await mkdir(dirname(out), { recursive: true });
+
+    await sharp(tinted, {
+      raw: { width: info.width, height: info.height, channels: 4 },
+    })
+      .extract(region)
+      .resize(SPRITE, SPRITE, { fit: "contain", background: CLEAR })
+      .png({ compressionLevel: 9 })
+      .toFile(out);
+
+    console.log(`  ${out.replace(root, ".")}  ${SPRITE}×${SPRITE}`);
+  }
+}
+
 // A tidy, small version of the master for use in the marketing page itself.
 await sharp(MASTER)
   .resize(720, 720, { fit: "inside" })

@@ -13,6 +13,9 @@ config.resolver.nodeModulesPaths = [
   path.resolve(projectRoot, "node_modules"),
   path.resolve(workspaceRoot, "node_modules"),
 ];
-config.resolver.disableHierarchicalLookup = true;
+
+// Left on (the default) deliberately: npm hoists most packages to the
+// workspace root, and disabling hierarchical lookup breaks resolution of
+// anything that did not get hoisted.
 
 module.exports = config;
