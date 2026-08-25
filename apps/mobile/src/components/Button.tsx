@@ -1,5 +1,6 @@
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useTheme, useShadow, type, radius } from "@/theme";
+import { BirdLoader } from "./BirdLoader";
 
 type Variant = "primary" | "secondary" | "ghost";
 
@@ -61,7 +62,9 @@ export function Button({
       ]}
     >
       {busy ? (
-        <ActivityIndicator color={ink} />
+        // The bird holds station rather than a spinner going round — waiting
+        // is the most-seen state in any app, so it may as well be ours.
+        <BirdLoader size={30} tint={variant === "primary" ? "paper" : "pine"} />
       ) : (
         <View style={styles.row}>
           {icon}

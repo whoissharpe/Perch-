@@ -17,6 +17,7 @@ import { SpaceMono_400Regular } from "@expo-google-fonts/space-mono";
 import { palette } from "@perch/core";
 import { AuthProvider } from "@/auth";
 import { FirstRunProvider, useFirstRun } from "@/firstRun";
+import { TransitionProvider } from "@/transition";
 
 export default function RootLayout() {
   const scheme = useColorScheme() === "dark" ? "dark" : "light";
@@ -36,6 +37,7 @@ export default function RootLayout() {
   return (
     <AuthProvider>
       <FirstRunProvider>
+        <TransitionProvider>
         <StatusBar style={scheme === "dark" ? "light" : "dark"} />
         <Stack
           screenOptions={{
@@ -56,7 +58,8 @@ export default function RootLayout() {
           />
           <Stack.Screen name="spot/[id]" options={{ animation: "slide_from_right" }} />
         </Stack>
-        <FirstRunGate />
+          <FirstRunGate />
+        </TransitionProvider>
       </FirstRunProvider>
     </AuthProvider>
   );

@@ -14,6 +14,7 @@ export const BIRD = {
     perched: require("../assets/bird-perched-pine.png"),
     mark: require("../assets/mark-pine.png"),
     open: require("../assets/open-pine.png"),
+    drag: require("../assets/drag-pine.png"),
   },
   paper: {
     up: require("../assets/bird-up-paper.png"),
@@ -21,13 +22,17 @@ export const BIRD = {
     perched: require("../assets/bird-perched-paper.png"),
     mark: require("../assets/mark-paper.png"),
     open: require("../assets/open-paper.png"),
+    drag: require("../assets/drag-paper.png"),
   },
 } as const;
 
 export type BirdPose = "up" | "spread" | "perched";
 export type BirdTint = keyof typeof BIRD;
-/** Every drawable: the three animation poses plus the two resting states. */
-export type BirdKey = BirdPose | "mark" | "open";
+/**
+ * Every drawable: the three animation poses, the two resting states, and the
+ * wide flight-with-ribbon used by the screen transition.
+ */
+export type BirdKey = BirdPose | "mark" | "open" | "drag";
 
 /**
  * Resolves an asset to a plain URL, which the DOM markers on web need.

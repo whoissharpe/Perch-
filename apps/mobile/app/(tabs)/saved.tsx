@@ -3,6 +3,8 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, space } from "@/theme";
 import { curatedNear } from "@/curated";
 import { SpotCard } from "@/components/SpotCard";
+import { Wordmark } from "@/components/Wordmark";
+import { EmptyPerch } from "@/components/EmptyPerch";
 
 /** Saved is what you reach for on the walk, so it stays deliberately plain. */
 export default function SavedScreen() {
@@ -27,11 +29,18 @@ export default function SavedScreen() {
         }}
         ListHeaderComponent={
           <View style={{ marginBottom: space.sm }}>
-            <Text style={[type.hero, { color: c.ink }]}>Saved</Text>
+            <Wordmark size={20} tone={c.pine} />
+            <Text style={[type.hero, { color: c.ink, marginTop: space.sm }]}>Saved</Text>
             <Text style={[type.body, { color: c.muted, marginTop: 6 }]}>
               {saved.length} spots. Available offline on Pro.
             </Text>
           </View>
+        }
+        ListEmptyComponent={
+          <EmptyPerch
+            title="Nothing saved yet"
+            body="Tap the bookmark on a spot and it waits here for the walk."
+          />
         }
         renderItem={({ item }) => (
           <View style={{ flex: 1 }}>

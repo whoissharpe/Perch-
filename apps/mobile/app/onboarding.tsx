@@ -10,13 +10,13 @@ import {
   useColorScheme,
 } from "react-native";
 import { Image } from "expo-image";
-import { useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
 import { Button } from "@/components/Button";
 import { Icon } from "@/components/Icon";
 import { Mark } from "@/components/Mark";
 import { useFirstRun } from "@/firstRun";
+import { useTransition } from "@/transition";
 import { PICKS } from "@/curated";
 
 const { width } = Dimensions.get("window");
@@ -59,10 +59,10 @@ const PANES = [
 
 export default function OnboardingScreen() {
   const c = useTheme();
-  const router = useRouter();
   const insets = useSafeAreaInsets();
   const dark = useColorScheme() === "dark";
   const { finish } = useFirstRun();
+  const { flyTo } = useTransition();
 
   const scroller = useRef<ScrollView>(null);
   const [index, setIndex] = useState(0);
@@ -84,7 +84,8 @@ export default function OnboardingScreen() {
 
   async function done() {
     await finish();
-    router.replace("/");
+    // The bird carries you out of the intro and into the map.
+    flyTo("/", "replace");
   }
 
   return (

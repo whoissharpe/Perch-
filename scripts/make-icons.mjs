@@ -120,6 +120,38 @@ for (const [name, tint] of [["pine", PINE], ["paper", PAPER]]) {
   console.log(`  ${out.replace(root, ".")}  320×320`);
 }
 
+/* ---------- screen-transition sprite ---------- */
+
+/**
+ * The bird in flight with a ribbon in its beak, used by the screen wipe in
+ * src/transition.tsx — it flies ahead and the next screen follows on the cord.
+ *
+ * Wide rather than square, because the ribbon is most of the drawing and
+ * squaring it would waste three quarters of the texture on empty space.
+ */
+for (const [name, tint] of [["pine", PINE], ["paper", PAPER]]) {
+  const src = await sharp(M("assets/drag-raw.png")).trim({ threshold: 1 }).png().toBuffer();
+  const { data, info } = await sharp(src)
+    .resize(640, 360, { fit: "contain", background: CLEAR })
+    .ensureAlpha()
+    .raw()
+    .toBuffer({ resolveWithObject: true });
+
+  for (let i = 0; i < data.length; i += 4) {
+    if (data[i + 3] > 0) {
+      data[i] = tint.r;
+      data[i + 1] = tint.g;
+      data[i + 2] = tint.b;
+    }
+  }
+
+  const out = M(`assets/drag-${name}.png`);
+  await sharp(data, { raw: { width: info.width, height: info.height, channels: 4 } })
+    .png({ compressionLevel: 9 })
+    .toFile(out);
+  console.log(`  ${out.replace(root, ".")}  640×360`);
+}
+
 /* ---------- landing-animation sprites ---------- */
 
 /** Tightest rectangle containing any non-transparent pixel. */

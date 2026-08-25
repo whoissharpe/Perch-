@@ -1,5 +1,6 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useTransition } from "@/transition";
 import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, space } from "@/theme";
@@ -21,6 +22,7 @@ import { PICKS } from "@/curated";
 export default function WelcomeScreen() {
   const c = useTheme();
   const router = useRouter();
+  const { flyTo } = useTransition();
   const insets = useSafeAreaInsets();
   const dark = useColorScheme() === "dark";
 
@@ -76,7 +78,7 @@ export default function WelcomeScreen() {
         </Text>
 
         <View style={styles.actions}>
-          <Button label="Get started" onPress={() => router.push("/onboarding")} />
+          <Button label="Get started" onPress={() => flyTo("/onboarding")} />
           <Pressable
             onPress={() => router.push("/sign-in")}
             accessibilityRole="button"

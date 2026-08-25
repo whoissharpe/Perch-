@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
 import { useAuth } from "@/auth";
 import { Mark } from "@/components/Mark";
+import { EmptyPerch } from "@/components/EmptyPerch";
 
 import { SpotCard } from "@/components/SpotCard";
 import type { SampleMark } from "@/sample";
@@ -65,9 +66,10 @@ export default function ProfileScreen() {
             Your marks
           </Text>
           {mine.length === 0 ? (
-            <Text style={[type.body, { color: c.muted, marginTop: space.sm }]}>
-              Nothing yet. The bench you walk past every day counts.
-            </Text>
+            <EmptyPerch
+              title="No marks yet"
+              body="The bench you walk past every day counts. Start there."
+            />
           ) : (
             <View style={{ gap: space.sm, marginTop: space.sm }}>
               {mine.map((m) => (

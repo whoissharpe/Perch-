@@ -9,6 +9,7 @@ import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
 import { Icon } from "@/components/Icon";
 import { Wordmark } from "@/components/Wordmark";
+import { BirdLoader } from "@/components/BirdLoader";
 import { PickStrip } from "@/components/PickStrip";
 import { useLiveLocation } from "@/useLiveLocation";
 
@@ -142,6 +143,8 @@ export default function MapScreen() {
             which has to stay visible for the licence. */}
         <View style={styles.hudRow}>
           <View style={[styles.hud, floating, { backgroundColor: c.surface, borderColor: c.line }]}>
+            {/* The bird does the waiting, here as everywhere else. */}
+            {nearby.loading && <BirdLoader size={16} />}
             <Text style={[type.meta, { color: c.muted }]}>
               {permission === "denied"
                 ? "LOCATION OFF"
@@ -210,6 +213,9 @@ const styles = StyleSheet.create({
   },
   hudRow: { paddingHorizontal: space.md, marginTop: space.sm, flexDirection: "row" },
   hud: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
     paddingHorizontal: 12,
     paddingVertical: 7,
     borderRadius: radius.pill,
