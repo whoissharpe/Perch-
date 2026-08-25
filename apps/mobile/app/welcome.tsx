@@ -26,7 +26,16 @@ export default function WelcomeScreen() {
   const insets = useSafeAreaInsets();
   const dark = useColorScheme() === "dark";
 
-  const shots = PICKS.slice(0, 3);
+  /**
+   * Three picks, chosen rather than sliced off the top of the list.
+   *
+   * `slice(0, 3)` gave whatever happened to be nearest, which put the
+   * Southbank Riverwalk photo — a large blue wayfinding sign — dead centre as
+   * the first thing anyone sees. These three are picked to read at thumbnail
+   * size: the Loiba bench facing the Atlantic in the middle, because it is the
+   * clearest picture of what this app is for.
+   */
+  const shots = [PICKS[0], PICKS[3], PICKS[8]].filter(Boolean);
 
   return (
     <View style={[styles.fill, { backgroundColor: c.paper }]}>
@@ -42,9 +51,12 @@ export default function WelcomeScreen() {
                 backgroundColor: c.surface,
                 borderColor: c.line,
                 transform: [
-                  { rotate: `${(i - 1) * 7}deg` },
-                  { translateX: (i - 1) * 96 },
-                  { translateY: Math.abs(i - 1) * 18 },
+                  { rotate: `${(i - 1) * 5}deg` },
+                  // Tighter than it was: at ±96 with a 7° tilt the outer
+                  // corners ran off both edges of a 390pt screen.
+                  { translateX: (i - 1) * 70 },
+                  { translateY: Math.abs(i - 1) * 16 },
+                  { scale: i === 1 ? 1 : 0.92 },
                 ],
                 zIndex: i === 1 ? 2 : 1,
                 shadowColor: "#000",
@@ -58,12 +70,15 @@ export default function WelcomeScreen() {
             <Image source={{ uri: p.image }} style={styles.img} contentFit="cover" />
           </View>
         ))}
-        {/* Fades the deck into the page so the type below never fights it. */}
-        <View
-          style={[styles.veil, { backgroundColor: c.paper }]}
-          // The gradient is faked with opacity because a real one would pull in
-          // a dependency for a single decorative edge.
-        />
+        {/* Fades the deck into the page so the type below never fights it.
+            Stepped bands rather than one flat panel: a single 92%-opaque block
+            left a visible hard line straight across the photographs. Six bands
+            read as a gradient without pulling in a dependency for one edge. */}
+        <View style={styles.veil} pointerEvents="none">
+          {VEIL_STEPS.map((o, i) => (
+            <View key={i} style={{ height: 26, backgroundColor: c.paper, opacity: o }} />
+          ))}
+        </View>
       </View>
 
       <View style={[styles.body, { paddingBottom: insets.bottom + space.lg }]}>
@@ -94,6 +109,9 @@ export default function WelcomeScreen() {
   );
 }
 
+/** Bottom-up opacity ramp for the fade under the photo deck. */
+const VEIL_STEPS = [0.12, 0.3, 0.52, 0.72, 0.88, 1];
+
 const styles = StyleSheet.create({
   fill: { flex: 1 },
   deck: {
@@ -107,14 +125,14 @@ const styles = StyleSheet.create({
   },
   shot: {
     position: "absolute",
-    width: 186,
-    height: 248,
+    width: 172,
+    height: 230,
     borderRadius: 20,
     borderWidth: 1,
     overflow: "hidden",
   },
   img: { width: "100%", height: "100%" },
-  veil: { position: "absolute", left: 0, right: 0, bottom: 0, height: 130, opacity: 0.92 },
+  veil: { position: "absolute", left: 0, right: 0, bottom: 0 },
   body: {
     marginTop: "auto",
     paddingHorizontal: space.lg,

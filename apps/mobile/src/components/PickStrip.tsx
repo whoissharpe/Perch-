@@ -16,13 +16,20 @@ import type { SampleMark } from "@/sample";
  * It hides itself the moment a spot is selected — the detail sheet takes the
  * same corner, and two stacked cards down there was the thing that made the
  * old layout feel cluttered.
+ *
+ * It can also be put away. Standing permanently across the bottom third of a
+ * map is a lot of rent for a suggestion, and the map is the product; the
+ * dismiss control hands that space back, and the heading pill brings the rail
+ * out again.
  */
 export function PickStrip({
   picks,
   onPick,
+  onDismiss,
 }: {
   picks: SampleMark[];
   onPick: (id: string) => void;
+  onDismiss: () => void;
 }) {
   const c = useTheme();
   const lift = useShadow("md");
@@ -34,8 +41,18 @@ export function PickStrip({
       <View style={styles.heading}>
         <View style={[styles.headPill, lift, { backgroundColor: c.pine }]}>
           <Mark size={15} tint="paper" />
-          <Text style={[type.meta, { color: c.onPine }]}>PERCH PICKS · REAL PLACES</Text>
+          <Text style={[type.meta, { color: c.onPine }]}>PERCH PICKS</Text>
         </View>
+
+        <Pressable
+          onPress={onDismiss}
+          accessibilityRole="button"
+          accessibilityLabel="Hide Perch Picks"
+          hitSlop={10}
+          style={[styles.hide, lift, { backgroundColor: c.surface, borderColor: c.line }]}
+        >
+          <Text style={[type.meta, { color: c.muted }]}>HIDE</Text>
+        </Pressable>
       </View>
 
       <ScrollView
@@ -124,7 +141,20 @@ const CARD = 208;
 
 const styles = StyleSheet.create({
   wrap: { position: "absolute", left: 0, right: 0, bottom: 30, zIndex: 4 },
-  heading: { paddingHorizontal: space.md, marginBottom: space.sm, flexDirection: "row" },
+  heading: {
+    paddingHorizontal: space.md,
+    marginBottom: space.sm,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  hide: {
+    minHeight: 34,
+    justifyContent: "center",
+    paddingHorizontal: 14,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+  },
   headPill: {
     flexDirection: "row",
     alignItems: "center",

@@ -9,6 +9,7 @@ import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
 import { Icon } from "@/components/Icon";
 import { Wordmark } from "@/components/Wordmark";
+import { Mark } from "@/components/Mark";
 import { BirdLoader } from "@/components/BirdLoader";
 import { PickStrip } from "@/components/PickStrip";
 import { useLiveLocation } from "@/useLiveLocation";
@@ -34,6 +35,9 @@ export default function MapScreen() {
   const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<string | null>(null);
   const [follow, setFollow] = useState(true);
+  // The rail is a suggestion, not furniture: it can be put away, and the map
+  // gets the space back until the user asks for it again.
+  const [showPicks, setShowPicks] = useState(true);
   const [focus, setFocus] = useState<{ lat: number; lng: number; n: number } | null>(
     null,
   );
@@ -166,8 +170,22 @@ export default function MapScreen() {
         <View style={[styles.sheet, raised]}>
           <SpotCard mark={active} />
         </View>
+      ) : showPicks ? (
+        <PickStrip
+          picks={picks}
+          onPick={openPick}
+          onDismiss={() => setShowPicks(false)}
+        />
       ) : (
-        <PickStrip picks={picks} onPick={openPick} />
+        <Pressable
+          onPress={() => setShowPicks(true)}
+          accessibilityRole="button"
+          accessibilityLabel="Show Perch Picks"
+          style={[styles.reopen, floating, { backgroundColor: c.pine }]}
+        >
+          <Mark size={15} tint="paper" />
+          <Text style={[type.meta, { color: c.onPine }]}>PERCH PICKS</Text>
+        </Pressable>
       )}
     </View>
   );
@@ -220,6 +238,19 @@ const styles = StyleSheet.create({
     paddingVertical: 7,
     borderRadius: radius.pill,
     borderWidth: 1,
+  },
+  reopen: {
+    position: "absolute",
+    left: space.md,
+    bottom: 34,
+    zIndex: 4,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 6,
+    paddingLeft: 8,
+    paddingRight: 13,
+    minHeight: 40,
+    borderRadius: radius.pill,
   },
   sheet: {
     position: "absolute",

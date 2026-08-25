@@ -22,7 +22,24 @@ const OVERPASS = "https://overpass-api.de/api/interpreter";
 
 /** Overpass is a shared free service; ask for a sensible amount and cache it. */
 const RADIUS_M = 1800;
-const MAX = 120;
+const MAX = 240;
+
+/**
+ * Minimum spacing between two unmarked pins, in metres.
+ *
+ * OpenStreetMap maps benches individually, so a plaza with seating all round
+ * it comes back as twenty nodes a few metres apart. Drawn honestly that is a
+ * ring of overlapping circles that reads as a rendering fault rather than as
+ * information — and it tells the user nothing they did not already know from
+ * one pin. Eighteen benches around a fountain is one place to sit, not
+ * eighteen.
+ *
+ * So the map keeps the first node in each cell of a ~40 m grid and drops the
+ * rest. Nothing is invented and nothing is merged into a fake "cluster"
+ * count; it is a thinning, and the dropped nodes come back as soon as the
+ * user is close enough for the grid to separate them.
+ */
+const SPACING_M = 40;
 
 interface OverpassEl {
   id: number;
@@ -74,12 +91,27 @@ out center ${MAX};`;
   const json = (await res.json()) as { elements?: OverpassEl[] };
   const out: SampleMark[] = [];
 
+  // Grid cell size in degrees. Longitude cells widen toward the poles, so the
+  // east-west step is corrected by the latitude — otherwise the thinning is
+  // far too aggressive in Reykjavik and far too loose in Singapore.
+  const latStep = SPACING_M / 111_320;
+  const lngStep = latStep / Math.max(0.2, Math.cos((lat * Math.PI) / 180));
+  const taken = new Set<string>();
+
   for (const e of json.elements ?? []) {
     const t = e.tags ?? {};
     const kind = kindFor(t);
     const eLat = e.lat ?? e.center?.lat;
     const eLng = e.lon ?? e.center?.lon;
     if (!kind || eLat == null || eLng == null) continue;
+
+    // A named spot always survives the thinning — somebody bothered to name
+    // it, which is exactly the signal worth keeping.
+    if (!t.name) {
+      const cell = `${Math.round(eLat / latStep)}:${Math.round(eLng / lngStep)}`;
+      if (taken.has(cell)) continue;
+      taken.add(cell);
+    }
 
     out.push({
       id: `osm-${e.id}`,

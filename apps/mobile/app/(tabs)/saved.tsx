@@ -32,7 +32,8 @@ export default function SavedScreen() {
             <Wordmark size={20} tone={c.pine} />
             <Text style={[type.hero, { color: c.ink, marginTop: space.sm }]}>Saved</Text>
             <Text style={[type.body, { color: c.muted, marginTop: 6 }]}>
-              {saved.length} spots. Available offline on Pro.
+              Nothing saved yet — these are ours, so the screen has something
+              to show. Yours will replace them.
             </Text>
           </View>
         }

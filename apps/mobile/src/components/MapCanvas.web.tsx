@@ -33,10 +33,14 @@ const TINT = {
   // Warm bone with an olive cast, to match the earthy green palette.
   light:
     "saturate(0.5) sepia(0.34) hue-rotate(30deg) saturate(1.25) brightness(1.01)",
-  // Invert to dark, then settle into a muted forest green — not black, and
-  // not the harder pine the palette used to run on.
+  // Invert to dark, then settle into a muted forest green.
+  //
+  // brightness was 0.66, which crushed the whole basemap to near-black: on a
+  // phone outdoors the roads and labels simply were not there. A map you
+  // cannot read is not a dark theme, it is a broken one. Lifted well up and
+  // given more contrast so streets and place names survive the tint.
   dark:
-    "invert(1) hue-rotate(180deg) grayscale(0.5) sepia(0.62) hue-rotate(62deg) saturate(1.7) brightness(0.66) contrast(1.04)",
+    "invert(1) hue-rotate(180deg) grayscale(0.45) sepia(0.5) hue-rotate(62deg) saturate(1.35) brightness(0.92) contrast(1.12)",
 };
 
 interface Pin {
