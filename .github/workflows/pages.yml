@@ -1,0 +1,63 @@
+name: Deploy preview to GitHub Pages
+
+# Publishes the Expo web export so the app can be opened from any device,
+# rather than only from the machine that ran `expo export`. This is a preview
+# build of the mobile app, not the marketing site.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Pages needs these; the default GITHUB_TOKEN permissions are not enough.
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deploy at a time. Do not cancel a running one — a half-finished deploy
+# is worse than a slightly stale one.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Export the web build
+        working-directory: apps/mobile
+        # Pages serves a project site from /<repo>/, so the bundle's absolute
+        # asset paths need that prefix or every request 404s and the page
+        # renders blank. app.config.js reads this.
+        env:
+          EXPO_BASE_URL: /${{ github.event.repository.name }}
+        run: |
+          npx expo export -p web --output-dir dist-web --clear
+          cp preview/frame.html dist-web/frame.html
+          # Pages runs Jekyll by default, which silently drops directories
+          # beginning with an underscore — including Expo's _expo/ bundle.
+          touch dist-web/.nojekyll
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: apps/mobile/dist-web
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - id: deploy
+        uses: actions/deploy-pages@v4
