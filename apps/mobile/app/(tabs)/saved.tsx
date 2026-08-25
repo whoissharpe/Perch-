@@ -29,7 +29,7 @@ export default function SavedScreen() {
         }}
         ListHeaderComponent={
           <View style={{ marginBottom: space.sm }}>
-            <Wordmark size={20} tone={c.pine} />
+            <Wordmark size={20} />
             <Text style={[type.hero, { color: c.ink, marginTop: space.sm }]}>Saved</Text>
             <Text style={[type.body, { color: c.muted, marginTop: 6 }]}>
               Nothing saved yet — these are ours, so the screen has something

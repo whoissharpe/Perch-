@@ -20,6 +20,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useScheme } from "@/scheme";
 import { BIRD } from "@/birdSprites";
+import { Mark } from "@/components/Mark";
 import { palette } from "@perch/core";
 
 /**
@@ -50,7 +51,13 @@ import { palette } from "@perch/core";
  * are the contract, the animation is the decoration on top of it.
  */
 
-const DURATION = 460;
+/**
+ * Per phase: cover, then reveal. 460 was too quick to read — the bird crossed
+ * the whole screen in under half a second and the effect registered as a
+ * flicker rather than as a character doing something. Slow enough to follow,
+ * short enough that it never feels like waiting.
+ */
+const DURATION = 720;
 
 interface TransitionValue {
   /** Navigate with the bird pulling the screen across. */
@@ -179,11 +186,25 @@ function Curtain({
     outputRange: [width, -DRAG_W, -width - DRAG_W],
   });
 
-  // A shallow dip in the middle: level flight looks like a slide, a slight
-  // arc looks like something alive is doing the pulling.
+  // A dip in the middle: level flight looks like a slide, an arc looks like
+  // something alive is doing the pulling. Deeper now that there is time to see
+  // it happen.
   const birdY = slide.interpolate({
-    inputRange: [0, 0.5, 1, 1.5, 2],
-    outputRange: [0, 26, 0, -22, 0],
+    inputRange: [0, 0.35, 0.7, 1, 1.35, 1.7, 2],
+    outputRange: [0, 34, 12, -6, -30, -10, 0],
+  });
+
+  // The panel is opaque, so at the halfway point the whole screen is one flat
+  // colour — which read as the app having gone blank rather than as a
+  // transition. The mark rides the panel and peaks exactly at the covered
+  // moment, so the pause has something in it.
+  const markIn = slide.interpolate({
+    inputRange: [0, 0.55, 1, 1.45, 2],
+    outputRange: [0, 0, 1, 0, 0],
+  });
+  const markLift = slide.interpolate({
+    inputRange: [0, 1, 2],
+    outputRange: [16, 0, -16],
   });
 
   return (
@@ -193,7 +214,16 @@ function Curtain({
           StyleSheet.absoluteFill,
           { backgroundColor: paper, transform: [{ translateX: panelX }] },
         ]}
-      />
+      >
+        <Animated.View
+          style={[
+            styles.stamp,
+            { opacity: markIn, transform: [{ translateY: markLift }] },
+          ]}
+        >
+          <Mark size={64} />
+        </Animated.View>
+      </Animated.View>
 
       <Animated.View
         style={[
@@ -215,12 +245,21 @@ function Curtain({
   );
 }
 
-/** Matches the 640×360 sprite's aspect so the ribbon never squashes. */
-const DRAG_W = 260;
-const DRAG_H = 146;
+/**
+ * Matches the 640×360 sprite's aspect so the ribbon never squashes. Bigger
+ * than it was: at 260 the bird was a detail at the edge of a moving panel
+ * rather than the thing pulling it.
+ */
+const DRAG_W = 330;
+const DRAG_H = 186;
 
 const styles = StyleSheet.create({
   bird: { position: "absolute", left: 0, width: DRAG_W, height: DRAG_H },
+  stamp: {
+    ...StyleSheet.absoluteFillObject,
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });
 
 export function useTransition() {

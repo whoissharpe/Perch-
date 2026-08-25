@@ -36,7 +36,7 @@ export default function FeedScreen() {
         }}
         ListHeaderComponent={
           <View style={{ marginBottom: space.xs }}>
-            <Wordmark size={22} tone={c.pine} />
+            <Wordmark size={22} />
             <Text style={[type.hero, { color: c.ink, marginTop: space.sm }]}>
               Nobody you follow has marked anything
             </Text>

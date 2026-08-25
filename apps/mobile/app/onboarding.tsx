@@ -115,9 +115,12 @@ export default function OnboardingScreen() {
     if (!scroll || paneW === 0) return;
     programmatic.current = true;
     if (release.current) clearTimeout(release.current);
+    // Long enough to outlast the smooth scroll and the snap that follows it,
+    // so the momentum handler cannot read an intermediate offset and set the
+    // index back to the pane we just left.
     release.current = setTimeout(() => {
       programmatic.current = false;
-    }, 600);
+    }, 1000);
     scrollToPane(scroller.current, next * paneW);
   }
 
@@ -244,14 +247,24 @@ function scrollToPane(node: ScrollView | null, x: number) {
   if ((node as unknown as { nodeType?: number }).nodeType === 1) {
     const el = node as unknown as HTMLElement;
     if (typeof el.scrollTo === "function") {
+      // Where it was before we asked. The rescue below compares against this,
+      // not against the target.
+      const from = el.scrollLeft;
       el.scrollTo({ left: x, behavior: "smooth" });
+
       // Smooth scrolling is frame-driven, so it does not run at all in a
-      // backgrounded tab, and some browsers and OS settings disable it
-      // outright. Check afterwards and jump if nothing moved: arriving
-      // instantly beats never arriving.
+      // backgrounded tab and some engines disable it outright — then the pane
+      // never moves. The rescue is for that case only.
+      //
+      // It used to fire whenever the pager was not yet at the target, which on
+      // a real device meant firing in the middle of a scroll that was working
+      // perfectly well: the hard assignment yanked it, scroll-snap argued
+      // back, and the whole thing juddered forwards and backwards. Now it only
+      // acts when nothing has moved at all.
       setTimeout(() => {
-        if (Math.abs(el.scrollLeft - x) > 2) el.scrollLeft = x;
-      }, 420);
+        const moved = Math.abs(el.scrollLeft - from) > 1;
+        if (!moved && Math.abs(el.scrollLeft - x) > 1) el.scrollLeft = x;
+      }, 700);
     } else {
       // Older engines ignore the options object entirely.
       el.scrollLeft = x;
