@@ -1,14 +1,16 @@
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, space } from "@/theme";
-import { SAMPLE_MARKS } from "@/sample";
+import { curatedNear } from "@/curated";
 import { SpotCard } from "@/components/SpotCard";
 
 /** Saved is what you reach for on the walk, so it stays deliberately plain. */
 export default function SavedScreen() {
   const c = useTheme();
   const insets = useSafeAreaInsets();
-  const saved = SAMPLE_MARKS.filter((m) => m.saves > 90);
+  // Nothing is really saved until auth and Supabase are wired up; showing
+  // a few picks is honest as long as it is not dressed up as the user's own.
+  const saved = curatedNear(0, 0).slice(0, 3);
 
   return (
     <View style={[styles.fill, { backgroundColor: c.paper }]}>

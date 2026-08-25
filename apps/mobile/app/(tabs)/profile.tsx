@@ -4,8 +4,9 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
 import { useAuth } from "@/auth";
 import { Mark } from "@/components/Mark";
-import { SAMPLE_MARKS } from "@/sample";
+
 import { SpotCard } from "@/components/SpotCard";
+import type { SampleMark } from "@/sample";
 
 export default function ProfileScreen() {
   const c = useTheme();
@@ -13,7 +14,9 @@ export default function ProfileScreen() {
   const router = useRouter();
   const { canPost, handle, demo, signOut } = useAuth();
 
-  const mine = SAMPLE_MARKS.slice(0, 2);
+  // You have not marked anything yet, and the app should say so rather than
+  // inventing a history for you.
+  const mine: SampleMark[] = [];
 
   return (
     <ScrollView
@@ -61,11 +64,17 @@ export default function ProfileScreen() {
           <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>
             Your marks
           </Text>
-          <View style={{ gap: space.sm, marginTop: space.sm }}>
-            {mine.map((m) => (
-              <SpotCard key={m.id} mark={m} />
-            ))}
-          </View>
+          {mine.length === 0 ? (
+            <Text style={[type.body, { color: c.muted, marginTop: space.sm }]}>
+              Nothing yet. The bench you walk past every day counts.
+            </Text>
+          ) : (
+            <View style={{ gap: space.sm, marginTop: space.sm }}>
+              {mine.map((m) => (
+                <SpotCard key={m.id} mark={m} />
+              ))}
+            </View>
+          )}
         </>
       )}
     </ScrollView>

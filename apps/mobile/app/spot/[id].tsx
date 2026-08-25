@@ -6,7 +6,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KIND_LABELS, formatCoords } from "@perch/core";
 import { useTheme, type, radius, space } from "@/theme";
 import { Icon } from "@/components/Icon";
-import { SAMPLE_MARKS } from "@/sample";
 import { curatedById } from "@/curated";
 
 export default function SpotScreen() {
@@ -16,7 +15,7 @@ export default function SpotScreen() {
   const insets = useSafeAreaInsets();
   const [saved, setSaved] = useState(false);
 
-  const spot = SAMPLE_MARKS.find((m) => m.id === id) ?? curatedById(id);
+  const spot = curatedById(id);
 
   if (!spot) {
     return (

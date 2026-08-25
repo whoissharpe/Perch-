@@ -2,7 +2,6 @@ import { useMemo } from "react";
 import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, space } from "@/theme";
-import { SAMPLE_MARKS } from "@/sample";
 import { curatedNear } from "@/curated";
 import { SpotCard } from "@/components/SpotCard";
 import { Wordmark } from "@/components/Wordmark";
@@ -17,10 +16,10 @@ export default function FeedScreen() {
 
   const centre = location ?? FALLBACK;
 
-  // Two picks lead the feed. Enough to set the standard for what a mark looks
-  // like; not so many that the feed becomes the team talking to itself.
+  // Nobody you follow has marked anything yet, because nobody exists yet. The
+  // feed shows the picks and says so, rather than inventing strangers.
   const data = useMemo(
-    () => [...curatedNear(centre.lat, centre.lng).slice(0, 2), ...SAMPLE_MARKS],
+    () => curatedNear(centre.lat, centre.lng),
     [centre.lat, centre.lng],
   );
 
@@ -39,10 +38,11 @@ export default function FeedScreen() {
           <View style={{ marginBottom: space.xs }}>
             <Wordmark size={22} tone={c.pine} />
             <Text style={[type.hero, { color: c.ink, marginTop: space.sm }]}>
-              Marked this week
+              Nobody you follow has marked anything
             </Text>
             <Text style={[type.body, { color: c.muted, marginTop: 6 }]}>
-              From the people you follow, and a couple from us.
+              So here are ours. Thirteen real places, most of which you have
+              probably never heard of.
             </Text>
           </View>
         }

@@ -3,8 +3,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KIND_LABELS, type SpotKind } from "@perch/core";
 import { useTheme, useShadow, type, radius, space } from "@/theme";
-import { SAMPLE_MARKS } from "@/sample";
 import { curatedNear } from "@/curated";
+import { useNearby } from "@/nearby";
 import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
 import { Icon } from "@/components/Icon";
@@ -44,7 +44,10 @@ export default function MapScreen() {
 
   const picks = useMemo(() => curatedNear(centre.lat, centre.lng), [centre.lat, centre.lng]);
 
-  const all = useMemo(() => [...picks, ...SAMPLE_MARKS], [picks]);
+  // Real benches and viewpoints around the user, live from OpenStreetMap.
+  const nearby = useNearby(centre.lat, centre.lng);
+
+  const all = useMemo(() => [...picks, ...nearby.spots], [picks, nearby.spots]);
 
   const visible = useMemo(() => {
     if (filter === "all") return all;
@@ -138,9 +141,13 @@ export default function MapScreen() {
             <Text style={[type.meta, { color: c.muted }]}>
               {permission === "denied"
                 ? "LOCATION OFF"
-                : follow && location
-                  ? "FOLLOWING YOUR WALK"
-                  : `${visible.length} SPOTS · ${visible.filter((m) => m.marks > 0).length} MARKED`}
+                : nearby.loading
+                  ? "READING THE MAP…"
+                  : nearby.error
+                    ? "OPENSTREETMAP UNREACHABLE"
+                    : nearby.spots.length === 0
+                      ? "NO MAPPED SPOTS NEARBY"
+                      : `${nearby.spots.length} REAL SPOTS NEARBY · NONE MARKED YET`}
             </Text>
           </View>
         </View>
