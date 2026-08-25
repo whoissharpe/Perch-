@@ -14,7 +14,8 @@ export type IconName =
   | "camera"
   | "video"
   | "pin"
-  | "chevron";
+  | "chevron"
+  | "search";
 
 const PATHS: Record<IconName, React.ReactNode> = {
   map: (
@@ -56,6 +57,12 @@ const PATHS: Record<IconName, React.ReactNode> = {
     </>
   ),
   chevron: <Path d="M9 5l7 7-7 7" />,
+  search: (
+    <>
+      <Path d="M11 4.5a6.5 6.5 0 1 0 0 13 6.5 6.5 0 0 0 0-13z" />
+      <Path d="M15.8 15.8L20 20" />
+    </>
+  ),
 };
 
 export function Icon({

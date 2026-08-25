@@ -6,11 +6,11 @@ import {
   StyleSheet,
   Text,
   View,
-  useColorScheme,
   useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useScheme } from "@/scheme";
 import { useTheme, type, radius, space } from "@/theme";
 import { Button } from "@/components/Button";
 import { Icon } from "@/components/Icon";
@@ -58,7 +58,7 @@ const PANES = [
 export default function OnboardingScreen() {
   const c = useTheme();
   const insets = useSafeAreaInsets();
-  const dark = useColorScheme() === "dark";
+  const dark = useScheme() === "dark";
   const { finish } = useFirstRun();
   const { flyTo } = useTransition();
 

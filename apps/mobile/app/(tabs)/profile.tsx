@@ -5,6 +5,7 @@ import { useTheme, type, radius, space } from "@/theme";
 import { useAuth } from "@/auth";
 import { Mark } from "@/components/Mark";
 import { EmptyPerch } from "@/components/EmptyPerch";
+import { useAppearance, type Appearance } from "@/scheme";
 
 import { SpotCard } from "@/components/SpotCard";
 import type { SampleMark } from "@/sample";
@@ -14,6 +15,7 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { canPost, handle, demo, signOut } = useAuth();
+  const { appearance, setAppearance } = useAppearance();
 
   // You have not marked anything yet, and the app should say so rather than
   // inventing a history for you.
@@ -79,11 +81,56 @@ export default function ProfileScreen() {
           )}
         </>
       )}
+      <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>Appearance</Text>
+      <Text style={[type.small, { color: c.muted, marginTop: 4 }]}>
+        A map gets looked at outdoors, where the system setting is often the
+        wrong one.
+      </Text>
+
+      <View style={[styles.segment, { backgroundColor: c.sunk, borderColor: c.line }]}>
+        {(["system", "light", "dark"] as Appearance[]).map((a) => {
+          const on = appearance === a;
+          return (
+            <Pressable
+              key={a}
+              onPress={() => setAppearance(a)}
+              accessibilityRole="radio"
+              accessibilityState={{ selected: on }}
+              accessibilityLabel={`${a} appearance`}
+              style={[
+                styles.segItem,
+                on && { backgroundColor: c.surface, borderColor: c.line },
+              ]}
+            >
+              <Text style={[type.small, { color: on ? c.ink : c.muted }]}>
+                {a === "system" ? "System" : a === "light" ? "Light" : "Dark"}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
+  segment: {
+    flexDirection: "row",
+    marginTop: space.sm,
+    padding: 4,
+    gap: 4,
+    borderRadius: radius.pill,
+    borderWidth: 1,
+  },
+  segItem: {
+    flex: 1,
+    minHeight: 40,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: radius.pill,
+    borderWidth: 1,
+    borderColor: "transparent",
+  },
   head: { flexDirection: "row", alignItems: "center", gap: space.sm },
   btn: {
     marginTop: space.md,

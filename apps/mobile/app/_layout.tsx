@@ -6,7 +6,6 @@ import {
   useSegments,
 } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useColorScheme } from "react-native";
 import { useFonts } from "expo-font";
 import { Fraunces_600SemiBold } from "@expo-google-fonts/fraunces";
 import {
@@ -18,11 +17,9 @@ import { palette } from "@perch/core";
 import { AuthProvider } from "@/auth";
 import { FirstRunProvider, useFirstRun } from "@/firstRun";
 import { TransitionProvider } from "@/transition";
+import { SchemeProvider, useScheme } from "@/scheme";
 
 export default function RootLayout() {
-  const scheme = useColorScheme() === "dark" ? "dark" : "light";
-  const c = palette[scheme];
-
   const [ready] = useFonts({
     Fraunces_600SemiBold,
     InstrumentSans_400Regular,
@@ -35,33 +32,49 @@ export default function RootLayout() {
   if (!ready) return null;
 
   return (
-    <AuthProvider>
-      <FirstRunProvider>
-        <TransitionProvider>
-        <StatusBar style={scheme === "dark" ? "light" : "dark"} />
-        <Stack
-          screenOptions={{
-            headerShown: false,
-            contentStyle: { backgroundColor: c.paper },
-          }}
-        >
-          <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="welcome" options={{ animation: "fade" }} />
-          <Stack.Screen name="onboarding" options={{ animation: "slide_from_right" }} />
-          <Stack.Screen
-            name="sign-in"
-            options={{ presentation: "modal", animation: "slide_from_bottom" }}
-          />
-          <Stack.Screen
-            name="mark"
-            options={{ presentation: "modal", animation: "slide_from_bottom" }}
-          />
-          <Stack.Screen name="spot/[id]" options={{ animation: "slide_from_right" }} />
-        </Stack>
-          <FirstRunGate />
-        </TransitionProvider>
-      </FirstRunProvider>
-    </AuthProvider>
+    // Appearance sits outermost: the status bar and every screen background
+    // below it resolve against the same choice, so the navigator itself has to
+    // be a child of the provider rather than a sibling.
+    <SchemeProvider>
+      <AuthProvider>
+        <FirstRunProvider>
+          <TransitionProvider>
+            <Navigation />
+            <FirstRunGate />
+          </TransitionProvider>
+        </FirstRunProvider>
+      </AuthProvider>
+    </SchemeProvider>
+  );
+}
+
+function Navigation() {
+  const scheme = useScheme();
+  const c = palette[scheme];
+
+  return (
+    <>
+      <StatusBar style={scheme === "dark" ? "light" : "dark"} />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: c.paper },
+        }}
+      >
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="welcome" options={{ animation: "fade" }} />
+        <Stack.Screen name="onboarding" options={{ animation: "slide_from_right" }} />
+        <Stack.Screen
+          name="sign-in"
+          options={{ presentation: "modal", animation: "slide_from_bottom" }}
+        />
+        <Stack.Screen
+          name="mark"
+          options={{ presentation: "modal", animation: "slide_from_bottom" }}
+        />
+        <Stack.Screen name="spot/[id]" options={{ animation: "slide_from_right" }} />
+      </Stack>
+    </>
   );
 }
 

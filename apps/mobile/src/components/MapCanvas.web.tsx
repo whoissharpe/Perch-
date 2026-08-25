@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
-import { useColorScheme } from "react-native";
 import maplibregl, { type Map as MapLibreMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { palette } from "@perch/core";
+import { useScheme } from "@/scheme";
 import {
   BIRD_ZOOM,
   LANDING,
@@ -67,7 +67,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: Ma
   const meMarker = useRef<Marker | null>(null);
   const resizeObs = useRef<ResizeObserver | null>(null);
 
-  const scheme = useColorScheme() === "dark" ? "dark" : "light";
+  const scheme = useScheme();
   const c = palette[scheme];
   // On the pale map the pine drawing reads; on the dark one it vanishes.
   const tint: BirdTint = scheme === "dark" ? "paper" : "pine";
@@ -362,14 +362,25 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: Ma
     if (follow) m.easeTo({ center: [me.lng, me.lat], duration: 900 });
   }, [me, follow]);
 
-  // Fly to a pick. Lands past PERCH_ZOOM so the bird is already on its bench.
+  // Fly to a pick or a search result. Lands past PERCH_ZOOM so the bird is
+  // already on its bench.
   useEffect(() => {
     if (!focus) return;
-    map.current?.easeTo({
-      center: [focus.lng, focus.lat],
-      zoom: 16.2,
-      duration: 1100,
-    });
+    const m = map.current;
+    if (!m) return;
+
+    m.easeTo({ center: [focus.lng, focus.lat], zoom: 16.2, duration: 1100 });
+
+    // easeTo is driven by animation frames, so it does nothing at all in a
+    // backgrounded or non-compositing view — and then a search result simply
+    // never takes you anywhere. Check after it should have arrived and jump.
+    const t = setTimeout(() => {
+      const at = m.getCenter();
+      const off =
+        Math.abs(at.lng - focus.lng) > 0.0005 || Math.abs(at.lat - focus.lat) > 0.0005;
+      if (off) m.jumpTo({ center: [focus.lng, focus.lat], zoom: 16.2 });
+    }, 1400);
+    return () => clearTimeout(t);
   }, [focus]);
 
   return (

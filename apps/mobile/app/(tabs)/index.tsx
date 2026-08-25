@@ -11,6 +11,8 @@ import { Icon } from "@/components/Icon";
 import { Wordmark } from "@/components/Wordmark";
 import { Mark } from "@/components/Mark";
 import { BirdLoader } from "@/components/BirdLoader";
+import { SearchSheet } from "@/components/SearchSheet";
+import type { PlaceHit } from "@/search";
 import { PickStrip } from "@/components/PickStrip";
 import { useLiveLocation } from "@/useLiveLocation";
 
@@ -38,6 +40,7 @@ export default function MapScreen() {
   // The rail is a suggestion, not furniture: it can be put away, and the map
   // gets the space back until the user asks for it again.
   const [showPicks, setShowPicks] = useState(true);
+  const [searching, setSearching] = useState(false);
   const [focus, setFocus] = useState<{ lat: number; lng: number; n: number } | null>(
     null,
   );
@@ -93,6 +96,20 @@ export default function MapScreen() {
             <Wordmark size={26} />
           </View>
 
+          <View style={styles.topActions}>
+          <Pressable
+            onPress={() => setSearching(true)}
+            accessibilityRole="button"
+            accessibilityLabel="Search places and spots"
+            style={[
+              styles.follow,
+              floating,
+              { backgroundColor: c.surface, borderColor: c.line },
+            ]}
+          >
+            <Icon name="search" color={c.body} size={17} />
+          </Pressable>
+
           <Pressable
             onPress={() => setFollow((f) => !f)}
             style={[
@@ -107,6 +124,7 @@ export default function MapScreen() {
           >
             <Icon name="pin" color={follow ? c.onPine : c.body} size={17} />
           </Pressable>
+          </View>
         </View>
 
         <ScrollView
@@ -164,6 +182,30 @@ export default function MapScreen() {
         </View>
       </View>
 
+      {searching && (
+        <View style={[styles.search, { paddingTop: insets.top + space.sm }]}>
+          <SearchSheet
+            spots={all}
+            near={centre}
+            onPickSpot={(id) => {
+              setSearching(false);
+              const spot = all.find((x) => x.id === id);
+              if (!spot) return;
+              setFollow(false);
+              setFocus({ lat: spot.lat, lng: spot.lng, n: Date.now() });
+              setSelected(id);
+            }}
+            onPickPlace={(hit: PlaceHit) => {
+              setSearching(false);
+              // Going somewhere else means the camera should stop chasing you.
+              setFollow(false);
+              setFocus({ lat: hit.lat, lng: hit.lng, n: Date.now() });
+            }}
+            onClose={() => setSearching(false)}
+          />
+        </View>
+      )}
+
       {/* The strip and the detail sheet share the bottom of the screen, so
           only one of them is ever up. */}
       {active ? (
@@ -199,6 +241,7 @@ function round(n: number) {
 const styles = StyleSheet.create({
   fill: { flex: 1 },
   top: { position: "absolute", left: 0, right: 0, zIndex: 5 },
+  topActions: { flexDirection: "row", alignItems: "center", gap: 8 },
   brandRow: {
     flexDirection: "row",
     alignItems: "center",
@@ -239,6 +282,7 @@ const styles = StyleSheet.create({
     borderRadius: radius.pill,
     borderWidth: 1,
   },
+  search: { position: "absolute", top: 0, left: 0, right: 0, bottom: 0, zIndex: 20 },
   reopen: {
     position: "absolute",
     left: space.md,

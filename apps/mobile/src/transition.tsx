@@ -15,10 +15,10 @@ import {
   Easing,
   StyleSheet,
   View,
-  useColorScheme,
 } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
+import { useScheme } from "@/scheme";
 import { BIRD } from "@/birdSprites";
 import { palette } from "@perch/core";
 
@@ -62,7 +62,7 @@ const TransitionContext = createContext<TransitionValue | null>(null);
 
 export function TransitionProvider({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const scheme = useColorScheme() === "dark" ? "dark" : "light";
+  const scheme = useScheme();
   const c = palette[scheme];
 
   const [busy, setBusy] = useState(false);

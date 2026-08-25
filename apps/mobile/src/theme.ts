@@ -1,11 +1,11 @@
-import { useColorScheme } from "react-native";
 import { palette, shadows, type Elevation, type Palette } from "@perch/core";
+import { useScheme } from "./scheme";
 
 export { fonts, type, space, radius } from "@perch/core";
 
 /** Resolves the shared palette against the device's colour scheme. */
 export function useTheme(): Palette {
-  return useColorScheme() === "dark" ? palette.dark : palette.light;
+  return useScheme() === "dark" ? palette.dark : palette.light;
 }
 
 /**
@@ -16,6 +16,6 @@ export function useTheme(): Palette {
  * ground entirely.
  */
 export function useShadow(level: Elevation = "sm") {
-  const scheme = useColorScheme() === "dark" ? "dark" : "light";
+  const scheme = useScheme();
   return shadows[scheme][level];
 }

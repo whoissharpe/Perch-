@@ -1,5 +1,5 @@
-import { useColorScheme } from "react-native";
 import { Image } from "expo-image";
+import { useScheme } from "@/scheme";
 import { BIRD, type BirdTint } from "@/birdSprites";
 
 /**
@@ -17,7 +17,7 @@ export function Mark({
   /** Force a tint. Omit to follow the colour scheme. */
   tint?: BirdTint;
 }) {
-  const scheme = useColorScheme() === "dark" ? "paper" : "pine";
+  const scheme = useScheme() === "dark" ? "paper" : "pine";
   const use = tint ?? scheme;
 
   return (

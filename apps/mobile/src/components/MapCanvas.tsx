@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_DEFAULT, type Region } from "react-native-maps";
-import { StyleSheet, View, useColorScheme } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { useTheme } from "@/theme";
 import { MAP_STYLE_LIGHT, MAP_STYLE_DARK } from "@/mapStyle";
+import { useScheme } from "@/scheme";
 import { BIRD_ZOOM, PERCH_ZOOM, pinScale } from "@/birdSprites";
 import { BirdPin } from "./BirdPin";
 import type { SampleMark } from "@/sample";
@@ -34,7 +35,7 @@ function zoomFrom(region: Region) {
  */
 export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: MapCanvasProps) {
   const c = useTheme();
-  const scheme = useColorScheme();
+  const scheme = useScheme();
   const map = useRef<MapView>(null);
   const [perched, setPerched] = useState(false);
   const [zoom, setZoom] = useState(13.5);

@@ -1,8 +1,9 @@
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { useTransition } from "@/transition";
-import { Pressable, StyleSheet, Text, View, useColorScheme } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useScheme } from "@/scheme";
 import { useTheme, type, space } from "@/theme";
 import { Mark } from "@/components/Mark";
 import { Button } from "@/components/Button";
@@ -24,7 +25,7 @@ export default function WelcomeScreen() {
   const router = useRouter();
   const { flyTo } = useTransition();
   const insets = useSafeAreaInsets();
-  const dark = useColorScheme() === "dark";
+  const dark = useScheme() === "dark";
 
   /**
    * Three picks, chosen rather than sliced off the top of the list.

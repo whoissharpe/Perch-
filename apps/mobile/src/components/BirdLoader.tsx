@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Animated, Easing, View, useColorScheme } from "react-native";
+import { Animated, Easing, View } from "react-native";
 import { Image } from "expo-image";
+import { useScheme } from "@/scheme";
 import { BIRD, type BirdPose } from "@/birdSprites";
 
 /**
@@ -22,7 +23,7 @@ export function BirdLoader({
   /** Force a tint. Omit to follow the colour scheme. */
   tint?: "pine" | "paper";
 }) {
-  const scheme = useColorScheme() === "dark" ? "paper" : "pine";
+  const scheme = useScheme() === "dark" ? "paper" : "pine";
   const use = tint ?? scheme;
 
   const [pose, setPose] = useState<BirdPose>("spread");
