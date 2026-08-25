@@ -2,7 +2,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { KIND_LABELS, formatCoords } from "@perch/core";
-import { useTheme, useShadow, type, radius, space } from "@/theme";
+import { useTheme, useShadow, type, fonts, radius, space } from "@/theme";
 import { Icon } from "./Icon";
 import { PerchBadge } from "./PerchBadge";
 import { Mark } from "./Mark";
@@ -44,6 +44,13 @@ export function SpotCard({ mark }: { mark: SampleMark }) {
             <Text style={[styles.kindText, type.meta]}>
               {KIND_LABELS[mark.kind].toUpperCase()}
             </Text>
+          </View>
+        )}
+        {mark.credit && (
+          // Wikimedia images are freely licensed, not free of obligation:
+          // the photographer and licence have to appear with the photo.
+          <View style={styles.credit}>
+            <Text style={styles.creditText}>{mark.credit}</Text>
           </View>
         )}
         {mark.isVideo && (
@@ -106,6 +113,21 @@ const styles = StyleSheet.create({
   mediaWrap: { aspectRatio: 4 / 3, width: "100%" },
   media: { width: "100%", height: "100%" },
   topLeft: { position: "absolute", top: 9, left: 9 },
+  credit: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    bottom: 0,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    backgroundColor: "rgba(15,22,17,0.55)",
+  },
+  creditText: {
+    color: "rgba(255,255,255,0.86)",
+    fontSize: 8.5,
+    fontFamily: fonts.mono,
+    letterSpacing: 0.4,
+  },
   note: {
     alignSelf: "flex-start",
     marginTop: space.sm,

@@ -21,8 +21,12 @@ export interface SampleMark {
   curated?: boolean;
   /** Why the team picked it, e.g. "Go at golden hour". Curated spots only. */
   note?: string;
-  /** Roughly how far the pick sits from the user, in metres. */
+  /** True great-circle distance from the user, in metres. */
   metresAway?: number;
+  /** Wikipedia record for a real place, so its claims can be checked. */
+  source?: string;
+  /** Photographer and licence for a Wikimedia Commons image. */
+  credit?: string;
 }
 
 const IMG = (id: string) =>

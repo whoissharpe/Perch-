@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -97,6 +97,24 @@ export default function SpotScreen() {
             {spot.caption}
           </Text>
 
+          {/* A pick is a real place, so every claim on this screen should be
+              checkable, and the photographer has to be credited. */}
+          {spot.source && (
+            <Pressable
+              onPress={() => Linking.openURL(spot.source!)}
+              style={[styles.source, { borderColor: c.line }]}
+            >
+              <Text style={[type.small, { color: c.pine }]}>
+                Verify this place on Wikipedia
+              </Text>
+              {spot.credit && (
+                <Text style={[type.meta, { color: c.muted, marginTop: 3 }]}>
+                  PHOTO: {spot.credit.toUpperCase()}
+                </Text>
+              )}
+            </Pressable>
+          )}
+
           <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>
             {spot.marks} marks here
           </Text>
@@ -110,6 +128,13 @@ export default function SpotScreen() {
 }
 
 const styles = StyleSheet.create({
+  source: {
+    marginTop: space.md,
+    paddingVertical: space.sm,
+    paddingHorizontal: space.md - 4,
+    borderWidth: 1,
+    borderRadius: radius.sm,
+  },
   fill: { flex: 1 },
   center: { alignItems: "center", justifyContent: "center" },
   hero: { width: "100%", aspectRatio: 4 / 3 },

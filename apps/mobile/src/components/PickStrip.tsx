@@ -34,7 +34,7 @@ export function PickStrip({
       <View style={styles.heading}>
         <View style={[styles.headPill, lift, { backgroundColor: c.pine }]}>
           <Mark size={15} tint="paper" />
-          <Text style={[type.meta, { color: c.onPine }]}>PERCH PICKS NEAR YOU</Text>
+          <Text style={[type.meta, { color: c.onPine }]}>PERCH PICKS · REAL PLACES</Text>
         </View>
       </View>
 
@@ -81,7 +81,7 @@ export function PickStrip({
                 {p.note}
               </Text>
               <Text style={[type.meta, { color: c.muted, marginTop: 6 }]}>
-                {walkTime(p.metresAway ?? 0)}
+                {away(p.metresAway ?? 0)}
               </Text>
             </View>
           </Pressable>
@@ -95,7 +95,8 @@ export function PickStrip({
           <Text
             style={[type.small, { color: c.muted, textAlign: "center", marginTop: 4 }]}
           >
-            Every one of these was somebody's walk.
+            None of these are near you. That is the point — there is one that
+            should be, and nobody has marked it.
           </Text>
         </View>
       </ScrollView>
@@ -103,12 +104,20 @@ export function PickStrip({
   );
 }
 
-/** Metres as something a person would actually say out loud. */
-function walkTime(m: number) {
-  if (m <= 0) return "NEARBY";
-  // 80 m/min is a normal unhurried pace, which is the pace this app is for.
-  const mins = Math.max(1, Math.round(m / 80));
-  return `${mins} MIN WALK · ${m < 1000 ? `${m} M` : `${(m / 1000).toFixed(1)} KM`}`;
+/**
+ * Distance, said the way a person would say it. These are real places at real
+ * coordinates, so most of them are nowhere near the user — the label gives a
+ * walk time only when walking is actually plausible, and otherwise just states
+ * the distance rather than dressing it up.
+ */
+function away(m: number) {
+  if (m <= 0) return "";
+  if (m < 2000) {
+    // 80 m/min is an unhurried pace, which is the pace this app is for.
+    return `${Math.max(1, Math.round(m / 80))} MIN WALK · ${Math.round(m)} M`;
+  }
+  const km = m / 1000;
+  return `${km < 100 ? km.toFixed(1) : Math.round(km).toLocaleString()} KM AWAY`;
 }
 
 const CARD = 208;
