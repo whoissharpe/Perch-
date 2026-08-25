@@ -94,7 +94,10 @@
   <div class="phone">
     <div class="notch"></div>
     <div class="screen">
-      <iframe id="app" src="/" title="Perch app"></iframe>
+      <!-- Relative, not "/": on GitHub Pages this file is served from
+           /<repo>/, so an absolute root src points at the user page and
+           404s. Relative works both there and locally. -->
+      <iframe id="app" src="index.html" title="Perch app"></iframe>
     </div>
   </div>
 
