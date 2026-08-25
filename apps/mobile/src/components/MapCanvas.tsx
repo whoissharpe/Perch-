@@ -16,6 +16,11 @@ export interface MapCanvasProps {
   me: LiveLocation | null;
   /** Whether the camera should track them as they walk. */
   follow: boolean;
+  /**
+   * A one-shot request to fly the camera somewhere, e.g. tapping a Perch
+   * Pick. Carries a nonce so asking for the same place twice still moves.
+   */
+  focus?: { lat: number; lng: number; n: number } | null;
 }
 
 /** react-native-maps reports a span, not a zoom level. This is the standard conversion. */
@@ -27,7 +32,7 @@ function zoomFrom(region: Region) {
  * The native map. A `.web.tsx` sibling stands in for browsers, where
  * react-native-maps has no implementation — Metro picks by platform extension.
  */
-export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvasProps) {
+export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: MapCanvasProps) {
   const c = useTheme();
   const scheme = useColorScheme();
   const map = useRef<MapView>(null);
@@ -45,6 +50,15 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
       { duration: 900 },
     );
   }, [follow, me]);
+
+  // Fly to a pick. Close enough that the bird is already perched on arrival.
+  useEffect(() => {
+    if (!focus) return;
+    map.current?.animateCamera(
+      { center: { latitude: focus.lat, longitude: focus.lng }, zoom: 16.2 },
+      { duration: 1100 },
+    );
+  }, [focus]);
 
   return (
     <MapView

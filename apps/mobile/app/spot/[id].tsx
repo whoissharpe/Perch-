@@ -7,6 +7,7 @@ import { KIND_LABELS, formatCoords } from "@perch/core";
 import { useTheme, type, radius, space } from "@/theme";
 import { Icon } from "@/components/Icon";
 import { SAMPLE_MARKS } from "@/sample";
+import { curatedById } from "@/curated";
 
 export default function SpotScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -15,7 +16,7 @@ export default function SpotScreen() {
   const insets = useSafeAreaInsets();
   const [saved, setSaved] = useState(false);
 
-  const spot = SAMPLE_MARKS.find((m) => m.id === id);
+  const spot = SAMPLE_MARKS.find((m) => m.id === id) ?? curatedById(id);
 
   if (!spot) {
     return (

@@ -55,7 +55,7 @@ interface Pin {
   animating: boolean;
 }
 
-export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvasProps) {
+export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: MapCanvasProps) {
   const host = useRef<HTMLDivElement | null>(null);
   const map = useRef<MapLibreMap | null>(null);
   const markers = useRef<Marker[]>([]);
@@ -234,6 +234,25 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         transition: "opacity .2s linear",
       });
 
+      if (s.curated) {
+        // A pick gets a soft pine disc under it. The bird sprite is identical
+        // to everyone else's, so the halo is the only tell — which keeps the
+        // team's spots findable without making them shout over real users'.
+        const halo = document.createElement("div");
+        Object.assign(halo.style, {
+          position: "absolute",
+          left: "50%",
+          bottom: "-5px",
+          width: "40px",
+          height: "14px",
+          marginLeft: "-20px",
+          borderRadius: "50%",
+          background: `radial-gradient(closest-side, ${c.pine}55, transparent)`,
+          pointerEvents: "none",
+        });
+        inner.append(halo);
+      }
+
       if (marked) {
         bird.src = birdUri(tint, "perched");
         mark.src = birdUri(tint, "mark");
@@ -338,6 +357,16 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
 
     if (follow) m.easeTo({ center: [me.lng, me.lat], duration: 900 });
   }, [me, follow]);
+
+  // Fly to a pick. Lands past PERCH_ZOOM so the bird is already on its bench.
+  useEffect(() => {
+    if (!focus) return;
+    map.current?.easeTo({
+      center: [focus.lng, focus.lat],
+      zoom: 16.2,
+      duration: 1100,
+    });
+  }, [focus]);
 
   return (
     <div

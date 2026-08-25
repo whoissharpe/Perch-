@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "perch-preview",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["--yes", "http-server", "apps/mobile/dist-web", "-p", "8097", "-c-1"],
+      "port": 8097
+    }
+  ]
+}

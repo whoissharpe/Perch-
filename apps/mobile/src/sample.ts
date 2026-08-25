@@ -17,6 +17,12 @@ export interface SampleMark {
   saves: number;
   isVideo: boolean;
   marks: number;
+  /** Marked by the Perch team -- see src/curated.ts. Renders as a Perch Pick. */
+  curated?: boolean;
+  /** Why the team picked it, e.g. "Go at golden hour". Curated spots only. */
+  note?: string;
+  /** Roughly how far the pick sits from the user, in metres. */
+  metresAway?: number;
 }
 
 const IMG = (id: string) =>

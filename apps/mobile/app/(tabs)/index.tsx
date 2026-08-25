@@ -4,13 +4,21 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KIND_LABELS, type SpotKind } from "@perch/core";
 import { useTheme, useShadow, type, radius, space } from "@/theme";
 import { SAMPLE_MARKS } from "@/sample";
+import { curatedNear } from "@/curated";
 import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
 import { Icon } from "@/components/Icon";
-import { Mark } from "@/components/Mark";
+import { Wordmark } from "@/components/Wordmark";
+import { PickStrip } from "@/components/PickStrip";
 import { useLiveLocation } from "@/useLiveLocation";
 
-const FILTERS: (SpotKind | "all")[] = ["all", "bench", "viewpoint", "trail_rest"];
+/** "picks" is not a SpotKind — it filters by who marked it, not what it is. */
+type Filter = SpotKind | "all" | "picks";
+
+const FILTERS: Filter[] = ["all", "picks", "bench", "viewpoint", "trail_rest"];
+
+/** Where the picks ring when there is no location fix yet. */
+const FALLBACK = { lat: 38.7223, lng: -9.1394 };
 
 export default function MapScreen() {
   const c = useTheme();
@@ -18,19 +26,42 @@ export default function MapScreen() {
   const floating = useShadow("sm");
   const raised = useShadow("md");
 
-  const [filter, setFilter] = useState<SpotKind | "all">("all");
+  const [filter, setFilter] = useState<Filter>("all");
   const [selected, setSelected] = useState<string | null>(null);
   const [follow, setFollow] = useState(true);
+  const [focus, setFocus] = useState<{ lat: number; lng: number; n: number } | null>(
+    null,
+  );
 
   const { location, permission } = useLiveLocation(true);
 
-  const visible = useMemo(
-    () =>
-      filter === "all" ? SAMPLE_MARKS : SAMPLE_MARKS.filter((m) => m.kind === filter),
-    [filter],
-  );
+  // The team's picks ring wherever the user actually is, so they recentre once
+  // the first fix lands. Rounded to ~10 m so ordinary GPS jitter does not
+  // rebuild every pin on the map.
+  const centre = location
+    ? { lat: round(location.lat), lng: round(location.lng) }
+    : FALLBACK;
+
+  const picks = useMemo(() => curatedNear(centre.lat, centre.lng), [centre.lat, centre.lng]);
+
+  const all = useMemo(() => [...picks, ...SAMPLE_MARKS], [picks]);
+
+  const visible = useMemo(() => {
+    if (filter === "all") return all;
+    if (filter === "picks") return picks;
+    return all.filter((m) => m.kind === filter);
+  }, [all, picks, filter]);
 
   const active = visible.find((m) => m.id === selected) ?? null;
+
+  const openPick = (id: string) => {
+    const p = picks.find((x) => x.id === id);
+    if (!p) return;
+    // Stop tracking the walk first, or the camera snaps straight back.
+    setFollow(false);
+    setFocus({ lat: p.lat, lng: p.lng, n: Date.now() });
+    setSelected(id);
+  };
 
   return (
     <View style={[styles.fill, { backgroundColor: c.paper }]}>
@@ -40,14 +71,14 @@ export default function MapScreen() {
         onSelect={setSelected}
         me={location}
         follow={follow}
+        focus={focus}
       />
 
       {/* brand + filters */}
       <View style={[styles.top, { top: insets.top + 8 }]}>
         <View style={styles.brandRow}>
           <View style={[styles.brand, floating, { backgroundColor: c.surface, borderColor: c.line }]}>
-            <Mark size={26} />
-            <Text style={[type.cardTitle, { color: c.ink }]}>Perch</Text>
+            <Wordmark size={26} />
           </View>
 
           <Pressable
@@ -88,7 +119,11 @@ export default function MapScreen() {
                 ]}
               >
                 <Text style={[type.small, { color: on ? c.onPine : c.body }]}>
-                  {f === "all" ? "Everything" : KIND_LABELS[f]}
+                  {f === "all"
+                    ? "Everything"
+                    : f === "picks"
+                      ? "Perch Picks"
+                      : KIND_LABELS[f]}
                 </Text>
               </Pressable>
             );
@@ -111,13 +146,22 @@ export default function MapScreen() {
         </View>
       </View>
 
-      {active && (
+      {/* The strip and the detail sheet share the bottom of the screen, so
+          only one of them is ever up. */}
+      {active ? (
         <View style={[styles.sheet, raised]}>
           <SpotCard mark={active} />
         </View>
+      ) : (
+        <PickStrip picks={picks} onPick={openPick} />
       )}
     </View>
   );
+}
+
+/** ~10 m of precision: enough to place a pick, stable enough not to churn. */
+function round(n: number) {
+  return Math.round(n * 10_000) / 10_000;
 }
 
 const styles = StyleSheet.create({

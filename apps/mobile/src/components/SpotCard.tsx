@@ -4,6 +4,8 @@ import { useRouter } from "expo-router";
 import { KIND_LABELS, formatCoords } from "@perch/core";
 import { useTheme, useShadow, type, radius, space } from "@/theme";
 import { Icon } from "./Icon";
+import { PerchBadge } from "./PerchBadge";
+import { Mark } from "./Mark";
 import type { SampleMark } from "@/sample";
 
 export function SpotCard({ mark }: { mark: SampleMark }) {
@@ -31,11 +33,19 @@ export function SpotCard({ mark }: { mark: SampleMark }) {
           contentFit="cover"
           transition={220}
         />
-        <View style={styles.kindChip}>
-          <Text style={[styles.kindText, type.meta]}>
-            {KIND_LABELS[mark.kind].toUpperCase()}
-          </Text>
-        </View>
+        {mark.curated ? (
+          // A pick announces itself instead of the kind — who marked it is
+          // the more useful fact when the team marked it.
+          <View style={styles.topLeft}>
+            <PerchBadge />
+          </View>
+        ) : (
+          <View style={styles.kindChip}>
+            <Text style={[styles.kindText, type.meta]}>
+              {KIND_LABELS[mark.kind].toUpperCase()}
+            </Text>
+          </View>
+        )}
         {mark.isVideo && (
           <View style={styles.playDot}>
             <Icon name="video" color="#fff" size={13} />
@@ -51,14 +61,31 @@ export function SpotCard({ mark }: { mark: SampleMark }) {
           {formatCoords(mark.lat, mark.lng)}
         </Text>
 
+        {mark.curated && mark.note && (
+          <View style={[styles.note, { backgroundColor: c.pineSoft }]}>
+            <Text style={[type.small, { color: c.pine }]}>{mark.note}</Text>
+          </View>
+        )}
+
         <View style={styles.row}>
           <View style={styles.who}>
-            <View style={[styles.avatar, { backgroundColor: c.pineSoft }]}>
-              <Text style={[styles.avatarText, { color: c.pine }]}>
-                {mark.who.slice(0, 1).toUpperCase()}
-              </Text>
-            </View>
-            <Text style={[type.small, { color: c.muted }]}>@{mark.who}</Text>
+            {mark.curated ? (
+              <>
+                <View style={[styles.avatar, { backgroundColor: c.pine }]}>
+                  <Mark size={15} tint="paper" />
+                </View>
+                <Text style={[type.small, { color: c.pine }]}>The Perch team</Text>
+              </>
+            ) : (
+              <>
+                <View style={[styles.avatar, { backgroundColor: c.pineSoft }]}>
+                  <Text style={[styles.avatarText, { color: c.pine }]}>
+                    {mark.who.slice(0, 1).toUpperCase()}
+                  </Text>
+                </View>
+                <Text style={[type.small, { color: c.muted }]}>@{mark.who}</Text>
+              </>
+            )}
           </View>
           <View style={styles.saves}>
             <Icon name="bookmark" color={c.muted} size={13} />
@@ -78,6 +105,14 @@ const styles = StyleSheet.create({
   },
   mediaWrap: { aspectRatio: 4 / 3, width: "100%" },
   media: { width: "100%", height: "100%" },
+  topLeft: { position: "absolute", top: 9, left: 9 },
+  note: {
+    alignSelf: "flex-start",
+    marginTop: space.sm,
+    paddingHorizontal: 9,
+    paddingVertical: 4,
+    borderRadius: radius.pill,
+  },
   kindChip: {
     position: "absolute",
     top: 9,
