@@ -94,10 +94,13 @@
   <div class="phone">
     <div class="notch"></div>
     <div class="screen">
-      <!-- Relative, not "/": on GitHub Pages this file is served from
-           /<repo>/, so an absolute root src points at the user page and
-           404s. Relative works both there and locally. -->
-      <iframe id="app" src="index.html" title="Perch app"></iframe>
+      <!-- "./", not "/" and not "index.html". Absolute "/" points at the
+           user page on GitHub Pages and 404s. "index.html" loads, but
+           expo-router strips the base URL and is left with the path
+           "/index.html", which matches no route and renders Unmatched
+           Route. The directory resolves to "/" after the strip, which is
+           the index route, and it works locally too. -->
+      <iframe id="app" src="./" title="Perch app"></iframe>
     </div>
   </div>
 
