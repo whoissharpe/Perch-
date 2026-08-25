@@ -1,13 +1,13 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Animated,
-  Dimensions,
   Pressable,
   ScrollView,
   StyleSheet,
   Text,
   View,
   useColorScheme,
+  useWindowDimensions,
 } from "react-native";
 import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -18,8 +18,6 @@ import { Mark } from "@/components/Mark";
 import { useFirstRun } from "@/firstRun";
 import { useTransition } from "@/transition";
 import { PICKS } from "@/curated";
-
-const { width } = Dimensions.get("window");
 
 /**
  * Three panes, and a way out on every one of them.
@@ -68,18 +66,59 @@ export default function OnboardingScreen() {
   const [index, setIndex] = useState(0);
   const progress = useRef(new Animated.Value(0)).current;
 
+  /**
+   * Pane width, live.
+   *
+   * This was a `Dimensions.get("window")` snapshot taken once at module load.
+   * Wherever that disagreed with the real width — a resized window, a browser
+   * that had not settled its layout when the bundle evaluated — `i * width`
+   * scrolled past the end, the browser clamped it, and every later tap
+   * computed the same index straight back. Next worked once and then did
+   * nothing.
+   *
+   * `useWindowDimensions` re-renders on change, so the value cannot go stale.
+   * An `onLayout` measurement would be tighter still, but it depends on a
+   * ResizeObserver firing and I could not verify that it does here; a hook
+   * that is right from the first render is the safer trade.
+   */
+  const { width: paneW } = useWindowDimensions();
+
+  /**
+   * True while a programmatic scroll is in flight, so the momentum handler
+   * does not answer our own scroll by issuing another one.
+   */
+  const programmatic = useRef(false);
+  const release = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Do not leave a timer running past the screen.
+  useEffect(
+    () => () => {
+      if (release.current) clearTimeout(release.current);
+    },
+    [],
+  );
+
   const last = index === PANES.length - 1;
 
-  function goTo(i: number) {
-    scrollToPane(scroller.current, i * width);
-    setIndex(i);
+  /** Move to a pane. `scroll` is false when the user got there by swiping. */
+  function goTo(i: number, scroll = true) {
+    const next = Math.max(0, Math.min(PANES.length - 1, i));
+    setIndex(next);
     Animated.timing(progress, {
-      toValue: i,
+      toValue: next,
       duration: 260,
       // Width cannot be driven natively; this is a 3-step bar, not a per-frame
       // animation, so the JS driver is the right trade here.
       useNativeDriver: false,
     }).start();
+
+    if (!scroll || paneW === 0) return;
+    programmatic.current = true;
+    if (release.current) clearTimeout(release.current);
+    release.current = setTimeout(() => {
+      programmatic.current = false;
+    }, 600);
+    scrollToPane(scroller.current, next * paneW);
   }
 
   async function done() {
@@ -125,15 +164,18 @@ export default function OnboardingScreen() {
         pagingEnabled
         showsHorizontalScrollIndicator={false}
         onMomentumScrollEnd={(e) => {
-          const i = Math.round(e.nativeEvent.contentOffset.x / width);
-          if (i !== index) goTo(i);
+          // Ignore the tail of our own scroll; only a real swipe should move
+          // the index from here, and it must never re-issue a scroll.
+          if (programmatic.current || paneW === 0) return;
+          const i = Math.round(e.nativeEvent.contentOffset.x / paneW);
+          if (i !== index) goTo(i, false);
         }}
         style={{ flex: 1 }}
       >
         {PANES.map((p) => {
           const shot = PICKS[p.pick];
           return (
-            <View key={p.key} style={[styles.pane, { width }]}>
+            <View key={p.key} style={[styles.pane, { width: paneW }]}>
               <View
                 style={[
                   styles.card,
@@ -203,9 +245,15 @@ function scrollToPane(node: ScrollView | null, x: number) {
     const el = node as unknown as HTMLElement;
     if (typeof el.scrollTo === "function") {
       el.scrollTo({ left: x, behavior: "smooth" });
+      // Smooth scrolling is frame-driven, so it does not run at all in a
+      // backgrounded tab, and some browsers and OS settings disable it
+      // outright. Check afterwards and jump if nothing moved: arriving
+      // instantly beats never arriving.
+      setTimeout(() => {
+        if (Math.abs(el.scrollLeft - x) > 2) el.scrollLeft = x;
+      }, 420);
     } else {
-      // Older engines ignore the options object entirely; jump instead of
-      // doing nothing.
+      // Older engines ignore the options object entirely.
       el.scrollLeft = x;
     }
     return;
