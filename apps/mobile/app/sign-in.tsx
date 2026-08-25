@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  ActivityIndicator,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -15,6 +14,29 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, radius, space } from "@/theme";
 import { useAuth } from "@/auth";
 import { Mark } from "@/components/Mark";
+import { Button } from "@/components/Button";
+import { Icon } from "@/components/Icon";
+
+/**
+ * Sign-in.
+ *
+ * Two decisions worth recording. First, every field has a visible label rather
+ * than a placeholder standing in for one — a placeholder disappears the moment
+ * somebody types, which is exactly when they need to check what they are
+ * filling in. Second, errors render against the field they belong to, not in a
+ * summary at the top, so the fix sits next to the problem.
+ *
+ * Apple and Google are the two providers that measurably cut sign-in friction,
+ * so the design has room for them. They are rendered disabled rather than
+ * faked: neither is configured yet, and a button that looks live and does
+ * nothing is worse than one that admits it.
+ */
+
+/**
+ * Flip once Apple and Google exist as Supabase auth providers and
+ * expo-web-browser + expo-auth-session are wired up for the redirect.
+ */
+const PROVIDERS_READY = false;
 
 export default function SignInScreen() {
   const c = useTheme();
@@ -27,6 +49,8 @@ export default function SignInScreen() {
   const [stage, setStage] = useState<"email" | "code">("email");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const emailOk = /\S+@\S+\.\S+/.test(email.trim());
 
   async function submitEmail() {
     setBusy(true);
@@ -53,127 +77,154 @@ export default function SignInScreen() {
     >
       <ScrollView
         contentContainerStyle={{
-          padding: space.lg,
-          paddingTop: insets.top + space.xl,
+          paddingHorizontal: space.lg,
+          paddingTop: insets.top + space.lg,
+          paddingBottom: insets.bottom + space.lg,
           flexGrow: 1,
         }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
-        <Mark size={76} />
+        <View style={styles.head}>
+          <Mark size={44} />
+        </View>
 
-        <Text style={[type.hero, { color: c.ink, marginTop: space.lg }]}>
+        <Text style={[type.hero, { color: c.ink, marginTop: space.md }]}>
           {stage === "email" ? "Sign in to mark spots" : "Check your email"}
         </Text>
-        <Text style={[type.body, { color: c.muted, marginTop: space.xs }]}>
+        <Text style={[type.body, { color: c.body, marginTop: space.xs }]}>
           {stage === "email"
-            ? "Browsing the map needs no account. Posting does, so people can follow you."
+            ? "Browsing the map needs no account. Marking a spot does, so people can follow you back."
             : `We sent a six-digit code to ${email}.`}
         </Text>
 
         {stage === "email" ? (
           <>
-            <TextInput
-              value={email}
-              onChangeText={setEmail}
-              placeholder="you@example.com"
-              placeholderTextColor={c.muted}
-              autoCapitalize="none"
-              autoCorrect={false}
-              keyboardType="email-address"
-              textContentType="emailAddress"
-              style={[
-                styles.input,
-                { color: c.ink, borderColor: c.line, backgroundColor: c.surface },
-              ]}
-            />
-            <Pressable
-              onPress={email.includes("@") && !busy ? submitEmail : undefined}
-              style={[
-                styles.btn,
-                {
-                  backgroundColor: email.includes("@") ? c.pine : c.sunk,
-                  opacity: busy ? 0.6 : 1,
-                },
-              ]}
-            >
-              {busy ? (
-                <ActivityIndicator color={c.onPine} />
-              ) : (
-                <Text
-                  style={[
-                    type.body,
-                    { color: email.includes("@") ? c.onPine : c.muted, fontWeight: "600" },
-                  ]}
-                >
-                  Email me a code
+            <View style={styles.providers}>
+              <Button
+                label="Continue with Apple"
+                variant="secondary"
+                disabled={!PROVIDERS_READY}
+                onPress={() => {}}
+                icon={<Icon name="person" color={c.ink} size={17} />}
+              />
+              <Button
+                label="Continue with Google"
+                variant="secondary"
+                disabled={!PROVIDERS_READY}
+                onPress={() => {}}
+                icon={<Icon name="person" color={c.ink} size={17} />}
+              />
+              {!PROVIDERS_READY && (
+                <Text style={[type.small, styles.note, { color: c.muted }]}>
+                  Apple and Google sign-in aren&rsquo;t set up yet. Email works.
                 </Text>
               )}
-            </Pressable>
+            </View>
+
+            <View style={styles.divider}>
+              <View style={[styles.rule, { backgroundColor: c.line }]} />
+              <Text style={[type.meta, { color: c.muted }]}>OR</Text>
+              <View style={[styles.rule, { backgroundColor: c.line }]} />
+            </View>
+
+            <Field label="Email address" error={error}>
+              <TextInput
+                value={email}
+                onChangeText={(v) => {
+                  setEmail(v);
+                  if (error) setError(null);
+                }}
+                placeholder="you@example.com"
+                placeholderTextColor={c.muted}
+                autoCapitalize="none"
+                autoCorrect={false}
+                keyboardType="email-address"
+                textContentType="emailAddress"
+                returnKeyType="go"
+                onSubmitEditing={emailOk && !busy ? submitEmail : undefined}
+                accessibilityLabel="Email address"
+                style={[
+                  styles.input,
+                  {
+                    color: c.ink,
+                    borderColor: error ? c.clay : c.line,
+                    backgroundColor: c.surface,
+                  },
+                ]}
+              />
+            </Field>
+
+            <View style={{ marginTop: space.sm }}>
+              <Button
+                label="Email me a code"
+                onPress={submitEmail}
+                disabled={!emailOk}
+                busy={busy}
+              />
+            </View>
           </>
         ) : (
           <>
-            <TextInput
-              value={code}
-              onChangeText={setCode}
-              placeholder="123456"
-              placeholderTextColor={c.muted}
-              keyboardType="number-pad"
-              maxLength={6}
-              textContentType="oneTimeCode"
-              style={[
-                styles.input,
-                styles.code,
-                { color: c.ink, borderColor: c.line, backgroundColor: c.surface },
-              ]}
-            />
+            <Field label="Six-digit code" error={error}>
+              <TextInput
+                value={code}
+                onChangeText={(v) => {
+                  setCode(v);
+                  if (error) setError(null);
+                }}
+                placeholder="123456"
+                placeholderTextColor={c.muted}
+                keyboardType="number-pad"
+                maxLength={6}
+                textContentType="oneTimeCode"
+                accessibilityLabel="Six-digit sign-in code"
+                style={[
+                  styles.input,
+                  styles.code,
+                  {
+                    color: c.ink,
+                    borderColor: error ? c.clay : c.line,
+                    backgroundColor: c.surface,
+                  },
+                ]}
+              />
+            </Field>
+
+            <View style={{ marginTop: space.sm }}>
+              <Button
+                label="Sign in"
+                onPress={submitCode}
+                disabled={code.length !== 6}
+                busy={busy}
+              />
+            </View>
+
             <Pressable
-              onPress={code.length === 6 && !busy ? submitCode : undefined}
-              style={[
-                styles.btn,
-                {
-                  backgroundColor: code.length === 6 ? c.pine : c.sunk,
-                  opacity: busy ? 0.6 : 1,
-                },
-              ]}
+              onPress={() => {
+                setStage("email");
+                setError(null);
+              }}
+              accessibilityRole="button"
+              style={styles.link}
             >
-              {busy ? (
-                <ActivityIndicator color={c.onPine} />
-              ) : (
-                <Text
-                  style={[
-                    type.body,
-                    { color: code.length === 6 ? c.onPine : c.muted, fontWeight: "600" },
-                  ]}
-                >
-                  Sign in
-                </Text>
-              )}
-            </Pressable>
-            <Pressable onPress={() => setStage("email")} style={styles.linkBtn}>
-              <Text style={[type.small, { color: c.muted }]}>
-                Use a different email
-              </Text>
+              <Text style={[type.small, { color: c.muted }]}>Use a different email</Text>
             </Pressable>
           </>
         )}
 
-        {error && (
-          <View style={[styles.error, { backgroundColor: c.claySoft }]}>
-            <Text style={[type.small, { color: c.clay }]}>{error}</Text>
-          </View>
-        )}
-
-        <View style={{ flex: 1 }} />
+        <View style={{ flex: 1, minHeight: space.lg }} />
 
         <Pressable
           onPress={() => {
             continueAsDemo();
             router.replace("/");
           }}
-          style={styles.linkBtn}
+          accessibilityRole="button"
+          style={styles.link}
         >
           <Text style={[type.small, { color: c.muted }]}>
-            Just looking — explore with sample spots
+            Just looking — explore the map first
           </Text>
         </Pressable>
       </ScrollView>
@@ -181,28 +232,53 @@ export default function SignInScreen() {
   );
 }
 
+/** Label above, error below, both attached to the control between them. */
+function Field({
+  label,
+  error,
+  children,
+}: {
+  label: string;
+  error: string | null;
+  children: React.ReactNode;
+}) {
+  const c = useTheme();
+  return (
+    <View style={{ marginTop: space.lg }}>
+      <Text style={[type.small, styles.label, { color: c.body }]}>{label}</Text>
+      {children}
+      {error && (
+        <View style={styles.errorRow}>
+          <Icon name="pin" color={c.clay} size={13} />
+          <Text style={[type.small, { color: c.clay, flex: 1 }]}>{error}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
   fill: { flex: 1 },
-  input: {
+  head: { flexDirection: "row", alignItems: "center" },
+  providers: { marginTop: space.lg, gap: space.sm },
+  note: { textAlign: "center", marginTop: 2 },
+  divider: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: space.sm,
     marginTop: space.lg,
+  },
+  rule: { flex: 1, height: 1 },
+  label: { marginBottom: 7, fontWeight: "500" },
+  input: {
     paddingHorizontal: 16,
-    paddingVertical: 14,
+    // 52 tall to match the buttons, comfortably over the 44 touch minimum.
+    height: 52,
     borderRadius: radius.sm,
     borderWidth: 1,
     fontSize: 16,
   },
   code: { fontSize: 22, letterSpacing: 8, textAlign: "center" },
-  btn: {
-    marginTop: space.sm,
-    paddingVertical: 15,
-    borderRadius: radius.pill,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  linkBtn: { paddingVertical: space.md, alignItems: "center" },
-  error: {
-    marginTop: space.md,
-    padding: space.sm,
-    borderRadius: radius.sm,
-  },
+  errorRow: { flexDirection: "row", alignItems: "center", gap: 6, marginTop: 7 },
+  link: { alignItems: "center", justifyContent: "center", paddingVertical: 14, minHeight: 44 },
 });

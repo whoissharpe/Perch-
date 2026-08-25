@@ -47,6 +47,11 @@ jobs:
           # Pages runs Jekyll by default, which silently drops directories
           # beginning with an underscore — including Expo's _expo/ bundle.
           touch dist-web/.nojekyll
+          # The export is a single-page app: only index.html exists, so a deep
+          # link like /onboarding is a 404 from the static host and the app
+          # never boots. Pages serves 404.html for unknown paths, so making it
+          # a copy of index.html turns those into client-side routes.
+          cp dist-web/index.html dist-web/404.html
 
       - uses: actions/upload-pages-artifact@v3
         with:
