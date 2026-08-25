@@ -17,8 +17,12 @@ type Filter = SpotKind | "all" | "picks";
 
 const FILTERS: Filter[] = ["all", "picks", "bench", "viewpoint", "trail_rest"];
 
-/** Where the picks ring when there is no location fix yet. */
-const FALLBACK = { lat: 38.7223, lng: -9.1394 };
+/**
+ * Centre used until the first location fix lands. Jacksonville, because that
+ * is where the first real picks are and an empty-handed first run should still
+ * open onto something walkable.
+ */
+const FALLBACK = { lat: 30.3322, lng: -81.6557 };
 
 export default function MapScreen() {
   const c = useTheme();

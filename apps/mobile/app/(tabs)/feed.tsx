@@ -7,7 +7,7 @@ import { SpotCard } from "@/components/SpotCard";
 import { Wordmark } from "@/components/Wordmark";
 import { useLiveLocation } from "@/useLiveLocation";
 
-const FALLBACK = { lat: 38.7223, lng: -9.1394 };
+const FALLBACK = { lat: 30.3322, lng: -81.6557 };
 
 export default function FeedScreen() {
   const c = useTheme();
