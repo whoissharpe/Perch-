@@ -141,7 +141,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
   }, [tint]);
 
   /* theme tint — on the canvas itself, never getCanvasContainer(). The
-     container also holds the markers, and inverting it turns every brass
+     container also holds the markers, and inverting it turns every clay
      pin green. */
   useEffect(() => {
     const canvas = map.current?.getCanvas();
@@ -227,8 +227,8 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
         height: "11px",
         marginLeft: "-5.5px",
         borderRadius: "50%",
-        background: c.brass,
-        boxShadow: `0 0 0 4px ${c.brass}33`,
+        background: c.clay,
+        boxShadow: `0 0 0 4px ${c.clay}33`,
         opacity: "0",
         pointerEvents: "none",
         transition: "opacity .2s linear",
@@ -280,7 +280,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow }: MapCanvas
     pins.current.forEach((p) => {
       if (p.marked) applyZoom(p, z);
     });
-  }, [spots, onSelect, c.pine, c.brass, tint]);
+  }, [spots, onSelect, c.pine, c.clay, tint]);
 
   /* Selection, applied by mutation so nothing is torn down. */
   const selectedRef = useRef<string | null>(selectedId);

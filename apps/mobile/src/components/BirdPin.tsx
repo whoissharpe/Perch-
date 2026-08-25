@@ -102,7 +102,7 @@ export function BirdPin({
     // unreadable pile, so far out each spot is just a point.
     return (
       <View style={styles.dotWrap}>
-        <View style={[styles.dot, { backgroundColor: BRASS }]} />
+        <View style={[styles.dot, { backgroundColor: CLAY }]} />
       </View>
     );
   }
@@ -146,7 +146,7 @@ export function BirdPin({
   );
 }
 
-const BRASS = "#b7863f";
+const CLAY = "#a9523a";
 
 const styles = StyleSheet.create({
   wrap: { alignItems: "center", justifyContent: "center" },

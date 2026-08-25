@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KIND_LABELS, type SpotKind } from "@perch/core";
-import { useTheme, type, radius, space } from "@/theme";
+import { useTheme, useShadow, type, radius, space } from "@/theme";
 import { SAMPLE_MARKS } from "@/sample";
 import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
@@ -15,6 +15,8 @@ const FILTERS: (SpotKind | "all")[] = ["all", "bench", "viewpoint", "trail_rest"
 export default function MapScreen() {
   const c = useTheme();
   const insets = useSafeAreaInsets();
+  const floating = useShadow("sm");
+  const raised = useShadow("md");
 
   const [filter, setFilter] = useState<SpotKind | "all">("all");
   const [selected, setSelected] = useState<string | null>(null);
@@ -43,7 +45,7 @@ export default function MapScreen() {
       {/* brand + filters */}
       <View style={[styles.top, { top: insets.top + 8 }]}>
         <View style={styles.brandRow}>
-          <View style={[styles.brand, { backgroundColor: c.surface, borderColor: c.line }]}>
+          <View style={[styles.brand, floating, { backgroundColor: c.surface, borderColor: c.line }]}>
             <Mark size={26} />
             <Text style={[type.cardTitle, { color: c.ink }]}>Perch</Text>
           </View>
@@ -52,6 +54,7 @@ export default function MapScreen() {
             onPress={() => setFollow((f) => !f)}
             style={[
               styles.follow,
+              floating,
               {
                 backgroundColor: follow ? c.pine : c.surface,
                 borderColor: follow ? c.pine : c.line,
@@ -77,6 +80,7 @@ export default function MapScreen() {
                 onPress={() => setFilter(f)}
                 style={[
                   styles.chip,
+                  floating,
                   {
                     backgroundColor: on ? c.pine : c.surface,
                     borderColor: on ? c.pine : c.line,
@@ -95,7 +99,7 @@ export default function MapScreen() {
             it collided with both the open spot card and the map attribution,
             which has to stay visible for the licence. */}
         <View style={styles.hudRow}>
-          <View style={[styles.hud, { backgroundColor: c.surface, borderColor: c.line }]}>
+          <View style={[styles.hud, floating, { backgroundColor: c.surface, borderColor: c.line }]}>
             <Text style={[type.meta, { color: c.muted }]}>
               {permission === "denied"
                 ? "LOCATION OFF"
@@ -108,7 +112,7 @@ export default function MapScreen() {
       </View>
 
       {active && (
-        <View style={styles.sheet}>
+        <View style={[styles.sheet, raised]}>
           <SpotCard mark={active} />
         </View>
       )}

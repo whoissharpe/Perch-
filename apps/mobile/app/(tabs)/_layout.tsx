@@ -18,6 +18,12 @@ export default function TabsLayout() {
           borderTopColor: c.line,
           height: 84,
           paddingTop: 8,
+          // the bar sits above the map, so it casts upward
+          shadowColor: "#000",
+          shadowOpacity: 0.12,
+          shadowRadius: 14,
+          shadowOffset: { width: 0, height: -3 },
+          elevation: 14,
         },
         tabBarLabelStyle: { fontFamily: fonts.body, fontSize: 11 },
       }}
@@ -50,7 +56,7 @@ export default function TabsLayout() {
               accessibilityRole="button"
               accessibilityLabel="Mark a spot"
             >
-              <View style={[styles.markBtn, { backgroundColor: c.brass }]}>
+              <View style={[styles.markBtn, { backgroundColor: c.clay }]}>
                 <Icon name="plus" color="#fff" size={22} />
               </View>
             </Pressable>

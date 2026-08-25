@@ -30,8 +30,8 @@ smudge. Use the wordmark alone there.
 
 ## Palette
 
-Earthy forest green: olive and sage on warm bone, with brass as the single
-accent. **If something is brass it means something on the map** — a pin, a new
+Earthy forest green: olive and sage on warm bone, with clay as the single
+accent. **If something is clay it means something on the map** — a pin, a new
 mark, your location, the capture button. Colour is never decoration here.
 
 | Token | Light | Dark | Use |
@@ -43,12 +43,12 @@ mark, your location, the capture button. Colour is never decoration here.
 | `body` | `#3d4b3f` | `#c4cdbf` | Body copy |
 | `muted` | `#7b8479` | `#838c7e` | Meta, coordinates |
 | `pine` | `#445c42` | `#a8be9c` | The brand. Primary actions, the mark |
-| `brass` | `#b7863f` | `#d8a961` | Map semantics only |
+| `clay` | `#a9523a` | `#e0866a` | Map semantics only |
 
 The neutral is a warm bone biased toward the olive rather than a pure grey, so
 it reads as chosen rather than inherited.
 
-Brass replaced an earlier blaze orange. Against this much green the orange
+Clay replaced an earlier blaze orange. Against this much green the orange
 shouted; a warm metal sits in the same world while staying clearly separate
 from every green on screen, which is what a map accent has to do.
 

@@ -3,10 +3,13 @@
  * marketing site. The web mirrors these as CSS custom properties in
  * apps/web/app/globals.css — if you change a value here, change it there.
  *
- * Earthy forest green: olive and sage greens on warm bone, with brass as the
- * single accent. Brass replaces the old blaze orange — against this much
- * green a bright orange shouted, where a warm metal sits in the same world
- * while staying clearly separate from every green on screen.
+ * Earthy forest green: olive and sage greens on warm bone, with a clay
+ * terracotta as the single accent.
+ *
+ * Clay is the third accent this has had. Blaze orange shouted against the
+ * green; brass sat too close to the olive in temperature and stopped reading
+ * as a separate thing. Clay is warm enough to belong and far enough round the
+ * wheel to survive on both grounds, which is the job of a map accent.
  */
 
 export const palette = {
@@ -21,8 +24,8 @@ export const palette = {
     pine: "#445c42",
     pineSoft: "#e1e7da",
     /** Map semantics only: a pin, a new mark, your location. */
-    brass: "#b7863f",
-    brassSoft: "#f3e9d6",
+    clay: "#a9523a",
+    claySoft: "#f6e6df",
     line: "rgba(30, 42, 33, 0.13)",
     lineSoft: "rgba(30, 42, 33, 0.07)",
     onPine: "#f4f2e9",
@@ -36,8 +39,8 @@ export const palette = {
     muted: "#838c7e",
     pine: "#a8be9c",
     pineSoft: "rgba(168, 190, 156, 0.14)",
-    brass: "#d8a961",
-    brassSoft: "rgba(216, 169, 97, 0.15)",
+    clay: "#e0866a",
+    claySoft: "rgba(224, 134, 106, 0.16)",
     line: "rgba(237, 240, 231, 0.13)",
     lineSoft: "rgba(237, 240, 231, 0.07)",
     onPine: "#131a14",
@@ -69,3 +72,68 @@ export const type = {
 
 export const space = { xs: 6, sm: 10, md: 16, lg: 24, xl: 36 } as const;
 export const radius = { sm: 9, md: 14, lg: 20, pill: 999 } as const;
+
+/**
+ * Elevation.
+ *
+ * Three steps, and every surface picks one deliberately — flat cards on a flat
+ * ground is what makes an interface look unfinished. Shadows are tinted with
+ * the ink rather than pure black so they sit in the palette, and they stay
+ * wide and low-opacity: the goal is a sense of the card being lifted off the
+ * page, not a visible dark edge under it.
+ *
+ * React Native needs the iOS properties and the Android `elevation` number
+ * separately; the web mirrors the same three steps as multi-layer box-shadows
+ * in globals.css.
+ */
+export const shadows = {
+  light: {
+    sm: {
+      shadowColor: "#1e2a21",
+      shadowOpacity: 0.06,
+      shadowRadius: 6,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 2,
+    },
+    md: {
+      shadowColor: "#1e2a21",
+      shadowOpacity: 0.09,
+      shadowRadius: 16,
+      shadowOffset: { width: 0, height: 6 },
+      elevation: 6,
+    },
+    lg: {
+      shadowColor: "#1e2a21",
+      shadowOpacity: 0.14,
+      shadowRadius: 30,
+      shadowOffset: { width: 0, height: 14 },
+      elevation: 12,
+    },
+  },
+  dark: {
+    // Dark grounds swallow a tinted shadow, so these go blacker and deeper.
+    sm: {
+      shadowColor: "#000000",
+      shadowOpacity: 0.34,
+      shadowRadius: 7,
+      shadowOffset: { width: 0, height: 2 },
+      elevation: 2,
+    },
+    md: {
+      shadowColor: "#000000",
+      shadowOpacity: 0.46,
+      shadowRadius: 18,
+      shadowOffset: { width: 0, height: 7 },
+      elevation: 6,
+    },
+    lg: {
+      shadowColor: "#000000",
+      shadowOpacity: 0.58,
+      shadowRadius: 32,
+      shadowOffset: { width: 0, height: 16 },
+      elevation: 12,
+    },
+  },
+} as const;
+
+export type Elevation = keyof (typeof shadows)["light"];

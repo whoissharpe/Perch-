@@ -2,12 +2,13 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import { KIND_LABELS, formatCoords } from "@perch/core";
-import { useTheme, type, radius, space } from "@/theme";
+import { useTheme, useShadow, type, radius, space } from "@/theme";
 import { Icon } from "./Icon";
 import type { SampleMark } from "@/sample";
 
 export function SpotCard({ mark }: { mark: SampleMark }) {
   const c = useTheme();
+  const shadow = useShadow("md");
   const router = useRouter();
 
   return (
@@ -15,6 +16,7 @@ export function SpotCard({ mark }: { mark: SampleMark }) {
       onPress={() => router.push(`/spot/${mark.id}`)}
       style={({ pressed }) => [
         styles.card,
+        shadow,
         {
           backgroundColor: c.surface,
           borderColor: c.line,
@@ -81,6 +83,11 @@ const styles = StyleSheet.create({
     top: 9,
     left: 9,
     backgroundColor: "rgba(255,255,255,0.93)",
+    // lifts the chip off a busy photograph
+    shadowColor: "#000",
+    shadowOpacity: 0.16,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 1 },
     paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: radius.pill,

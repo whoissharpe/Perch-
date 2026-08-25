@@ -335,7 +335,7 @@ export default function Home() {
               <div className="card card--feature pad-lg stack reveal" style={{ "--i": 1 } as React.CSSProperties}>
                 <div className="row between gap-xs">
                   <span className="meta">Perch Pro</span>
-                  <span className="tag tag--brass">Launch price</span>
+                  <span className="tag tag--clay">Launch price</span>
                 </div>
                 <p className="price">
                   &euro;3.50<span className="price__per">/month</span>
@@ -392,7 +392,7 @@ export default function Home() {
                   <input id="email" name="email" type="email" required placeholder="you@example.com" autoComplete="email" />
                   <label className="sr-only" htmlFor="city">Where you walk</label>
                   <input id="city" name="city" type="text" placeholder="Where you walk" />
-                  <button className="btn btn--brass" type="submit">Join</button>
+                  <button className="btn btn--clay" type="submit">Join</button>
                 </form>
                 <p className="meta mt-md">One email when your area opens. Nothing else.</p>
               </div>

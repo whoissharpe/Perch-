@@ -43,7 +43,7 @@ export default function SpotScreen() {
         </View>
 
         <View style={{ padding: space.md }}>
-          <Text style={[type.meta, { color: c.brass }]}>
+          <Text style={[type.meta, { color: c.clay }]}>
             {KIND_LABELS[spot.kind].toUpperCase()}
           </Text>
           <Text style={[type.hero, { color: c.ink, marginTop: 6 }]}>{spot.name}</Text>
