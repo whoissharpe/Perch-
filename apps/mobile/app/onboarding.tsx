@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   Animated,
+  Easing,
+  PanResponder,
   Pressable,
-  ScrollView,
   StyleSheet,
   Text,
   View,
@@ -30,10 +31,23 @@ import { PICKS } from "@/curated";
  * The progress bar is segmented rather than a dot row because dots stop being
  * readable as progress the moment there are more than about four of them, and
  * because a bar answers "how much is left" at a glance.
+ *
+ * The pager is a transform, not a scroll view. It used to be a horizontal
+ * ScrollView with pagingEnabled, which on the web sets CSS scroll-snap to
+ * mandatory — and the browser's snap engine kept overriding the programmatic
+ * scroll and re-snapping to the pane we had just left, so Next appeared to go
+ * backwards. Trying to rescue that with timers only made it judder, because
+ * the rescue and the snap took turns undoing each other. Driving translateX
+ * directly takes the browser out of the argument: nothing can snap, the
+ * position is whatever we last set, and the same code runs on both platforms.
+ * Swipe is a PanResponder, which is the same gesture without the container.
  */
 // Picks chosen from opposite ends of the list on purpose: three photographs of
 // the same city would make the map look local, which is the wrong first
 // impression.
+/** One pane's worth of travel. */
+const SLIDE_MS = 340;
+
 const PANES = [
   {
     key: "map",
@@ -62,73 +76,108 @@ export default function OnboardingScreen() {
   const { finish } = useFirstRun();
   const { flyTo } = useTransition();
 
-  const scroller = useRef<ScrollView>(null);
-  const [index, setIndex] = useState(0);
-  const progress = useRef(new Animated.Value(0)).current;
-
-  /**
-   * Pane width, live.
-   *
-   * This was a `Dimensions.get("window")` snapshot taken once at module load.
-   * Wherever that disagreed with the real width — a resized window, a browser
-   * that had not settled its layout when the bundle evaluated — `i * width`
-   * scrolled past the end, the browser clamped it, and every later tap
-   * computed the same index straight back. Next worked once and then did
-   * nothing.
-   *
-   * `useWindowDimensions` re-renders on change, so the value cannot go stale.
-   * An `onLayout` measurement would be tighter still, but it depends on a
-   * ResizeObserver firing and I could not verify that it does here; a hook
-   * that is right from the first render is the safer trade.
-   */
   const { width: paneW } = useWindowDimensions();
+  const [index, setIndex] = useState(0);
 
-  /**
-   * True while a programmatic scroll is in flight, so the momentum handler
-   * does not answer our own scroll by issuing another one.
-   */
-  const programmatic = useRef(false);
-  const release = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const progress = useRef(new Animated.Value(0)).current;
+  /** Settled offset, counted in panes rather than pixels. */
+  const slide = useRef(new Animated.Value(0)).current;
+  /** Live finger movement in pixels, added on top of the settled offset. */
+  const drag = useRef(new Animated.Value(0)).current;
 
-  // Do not leave a timer running past the screen.
+  const indexRef = useRef(0);
+  const settle = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const last = index === PANES.length - 1;
+
+  // Do not leave the settle timer running past the screen.
   useEffect(
     () => () => {
-      if (release.current) clearTimeout(release.current);
+      if (settle.current) clearTimeout(settle.current);
     },
     [],
   );
 
-  const last = index === PANES.length - 1;
-
-  /** Move to a pane. `scroll` is false when the user got there by swiping. */
-  function goTo(i: number, scroll = true) {
+  function goTo(i: number) {
     const next = Math.max(0, Math.min(PANES.length - 1, i));
+    indexRef.current = next;
     setIndex(next);
-    Animated.timing(progress, {
-      toValue: next,
-      duration: 260,
-      // Width cannot be driven natively; this is a 3-step bar, not a per-frame
-      // animation, so the JS driver is the right trade here.
-      useNativeDriver: false,
-    }).start();
+    drag.setValue(0);
 
-    if (!scroll || paneW === 0) return;
-    programmatic.current = true;
-    if (release.current) clearTimeout(release.current);
-    // Long enough to outlast the smooth scroll and the snap that follows it,
-    // so the momentum handler cannot read an intermediate offset and set the
-    // index back to the pane we just left.
-    release.current = setTimeout(() => {
-      programmatic.current = false;
-    }, 1000);
-    scrollToPane(scroller.current, next * paneW);
+    Animated.parallel([
+      Animated.timing(slide, {
+        toValue: next,
+        duration: SLIDE_MS,
+        easing: Easing.bezier(0.32, 0.72, 0, 1),
+        useNativeDriver: true,
+      }),
+      Animated.timing(progress, {
+        toValue: next,
+        duration: SLIDE_MS,
+        // Width cannot be driven natively; this is a 3-step bar, not a
+        // per-frame animation, so the JS driver is the right trade here.
+        useNativeDriver: false,
+      }),
+    ]).start();
+
+    // Guarantee arrival. Animated.timing only advances while frames are being
+    // drawn, so in a backgrounded or throttled view the strip would sit where
+    // it was and the pane would never change — the same failure that has now
+    // bitten the transition, the camera and this pager. setValue writes the
+    // position directly, so if the animation did run this is a no-op and if it
+    // did not, the pane still arrives.
+    if (settle.current) clearTimeout(settle.current);
+    settle.current = setTimeout(() => {
+      slide.setValue(next);
+      progress.setValue(next);
+    }, SLIDE_MS + 80);
   }
+
+  // The responder is created once, so it reaches the latest goTo through a ref
+  // rather than closing over the first one.
+  const goToRef = useRef(goTo);
+  goToRef.current = goTo;
+
+  const pan = useRef(
+    PanResponder.create({
+      // Only claim the gesture once it is clearly horizontal, so a vertical
+      // flick still belongs to the page rather than to the pager.
+      onMoveShouldSetPanResponder: (_e, g) =>
+        Math.abs(g.dx) > 12 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
+      onPanResponderMove: (_e, g) => drag.setValue(g.dx),
+      onPanResponderRelease: (_e, g) => {
+        // A quick flick counts as much as a long drag.
+        const far = Math.abs(g.dx) > 90 || Math.abs(g.vx) > 0.35;
+        if (far) goToRef.current(indexRef.current + (g.dx < 0 ? 1 : -1));
+        else
+          Animated.timing(drag, {
+            toValue: 0,
+            duration: 180,
+            useNativeDriver: true,
+          }).start();
+      },
+      onPanResponderTerminate: () => {
+        Animated.timing(drag, {
+          toValue: 0,
+          duration: 180,
+          useNativeDriver: true,
+        }).start();
+      },
+    }),
+  ).current;
 
   async function done() {
     await finish();
     // The bird carries you out of the intro and into the map.
     flyTo("/", "replace");
   }
+
+  const stripX = Animated.add(
+    slide.interpolate({
+      inputRange: [0, PANES.length - 1],
+      outputRange: [0, -paneW * (PANES.length - 1)],
+    }),
+    drag,
+  );
 
   return (
     <View style={[styles.fill, { backgroundColor: c.paper }]}>
@@ -154,69 +203,62 @@ export default function OnboardingScreen() {
           onPress={done}
           accessibilityRole="button"
           accessibilityLabel="Skip the introduction"
-          // 44 wide minimum, even though the word is short.
           style={styles.skip}
         >
           <Text style={[type.small, { color: c.muted }]}>Skip</Text>
         </Pressable>
       </View>
 
-      <ScrollView
-        ref={scroller}
-        horizontal
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onMomentumScrollEnd={(e) => {
-          // Ignore the tail of our own scroll; only a real swipe should move
-          // the index from here, and it must never re-issue a scroll.
-          if (programmatic.current || paneW === 0) return;
-          const i = Math.round(e.nativeEvent.contentOffset.x / paneW);
-          if (i !== index) goTo(i, false);
-        }}
-        style={{ flex: 1 }}
-      >
-        {PANES.map((p) => {
-          const shot = PICKS[p.pick];
-          return (
-            <View key={p.key} style={[styles.pane, { width: paneW }]}>
-              <View
-                style={[
-                  styles.card,
-                  {
-                    backgroundColor: c.surface,
-                    borderColor: c.line,
-                    shadowColor: "#000",
-                    shadowOpacity: dark ? 0.5 : 0.14,
-                    shadowRadius: 26,
-                    shadowOffset: { width: 0, height: 12 },
-                    elevation: 10,
-                  },
-                ]}
-              >
-                <Image
-                  source={{ uri: shot.image }}
-                  style={styles.img}
-                  contentFit="cover"
-                  transition={220}
-                />
-                <View style={[styles.caption, { backgroundColor: c.pine }]}>
-                  <Icon name="pin" color={c.onPine} size={13} />
-                  <Text style={[type.meta, { color: c.onPine }]}>
-                    {shot.place.toUpperCase()}
-                  </Text>
+      <View style={styles.viewport} {...pan.panHandlers}>
+        <Animated.View
+          style={[
+            styles.strip,
+            { width: paneW * PANES.length, transform: [{ translateX: stripX }] },
+          ]}
+        >
+          {PANES.map((p) => {
+            const shot = PICKS[p.pick];
+            return (
+              <View key={p.key} style={[styles.pane, { width: paneW }]}>
+                <View
+                  style={[
+                    styles.card,
+                    {
+                      backgroundColor: c.surface,
+                      borderColor: c.line,
+                      shadowColor: "#000",
+                      shadowOpacity: dark ? 0.5 : 0.14,
+                      shadowRadius: 26,
+                      shadowOffset: { width: 0, height: 12 },
+                      elevation: 10,
+                    },
+                  ]}
+                >
+                  <Image
+                    source={{ uri: shot.image }}
+                    style={styles.img}
+                    contentFit="cover"
+                    transition={220}
+                  />
+                  <View style={[styles.caption, { backgroundColor: c.pine }]}>
+                    <Icon name="pin" color={c.onPine} size={13} />
+                    <Text style={[type.meta, { color: c.onPine }]}>
+                      {shot.place.toUpperCase()}
+                    </Text>
+                  </View>
                 </View>
-              </View>
 
-              <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>
-                {p.title}
-              </Text>
-              <Text style={[type.body, { color: c.body, marginTop: space.sm }]}>
-                {p.body}
-              </Text>
-            </View>
-          );
-        })}
-      </ScrollView>
+                <Text style={[type.title, { color: c.ink, marginTop: space.lg }]}>
+                  {p.title}
+                </Text>
+                <Text style={[type.body, { color: c.body, marginTop: space.sm }]}>
+                  {p.body}
+                </Text>
+              </View>
+            );
+          })}
+        </Animated.View>
+      </View>
 
       <View style={[styles.actions, { paddingBottom: insets.bottom + space.lg }]}>
         <Button
@@ -231,49 +273,6 @@ export default function OnboardingScreen() {
   );
 }
 
-/**
- * Move the pager to an offset, on either platform.
- *
- * On native the ref is a ScrollView instance and takes React Native's
- * `{ x, y, animated }`. On web the same ref resolves to the underlying DOM
- * node, whose `scrollTo` expects `{ left, top, behavior }` and *silently
- * ignores* keys it does not recognise — so the native-shaped call is a no-op.
- * That is why the counter and the progress bar advanced while the panes sat
- * still: everything except the actual scroll was working.
- */
-function scrollToPane(node: ScrollView | null, x: number) {
-  if (!node) return;
-  // A DOM element has nodeType 1; a ScrollView instance does not.
-  if ((node as unknown as { nodeType?: number }).nodeType === 1) {
-    const el = node as unknown as HTMLElement;
-    if (typeof el.scrollTo === "function") {
-      // Where it was before we asked. The rescue below compares against this,
-      // not against the target.
-      const from = el.scrollLeft;
-      el.scrollTo({ left: x, behavior: "smooth" });
-
-      // Smooth scrolling is frame-driven, so it does not run at all in a
-      // backgrounded tab and some engines disable it outright — then the pane
-      // never moves. The rescue is for that case only.
-      //
-      // It used to fire whenever the pager was not yet at the target, which on
-      // a real device meant firing in the middle of a scroll that was working
-      // perfectly well: the hard assignment yanked it, scroll-snap argued
-      // back, and the whole thing juddered forwards and backwards. Now it only
-      // acts when nothing has moved at all.
-      setTimeout(() => {
-        const moved = Math.abs(el.scrollLeft - from) > 1;
-        if (!moved && Math.abs(el.scrollLeft - x) > 1) el.scrollLeft = x;
-      }, 700);
-    } else {
-      // Older engines ignore the options object entirely.
-      el.scrollLeft = x;
-    }
-    return;
-  }
-  node.scrollTo({ x, y: 0, animated: true });
-}
-
 const styles = StyleSheet.create({
   fill: { flex: 1 },
   top: {
@@ -286,6 +285,8 @@ const styles = StyleSheet.create({
   track: { flex: 1, height: 4, borderRadius: 2, overflow: "hidden" },
   fillBar: { height: "100%", borderRadius: 2 },
   skip: { minWidth: 44, minHeight: 44, alignItems: "flex-end", justifyContent: "center" },
+  viewport: { flex: 1, overflow: "hidden" },
+  strip: { flex: 1, flexDirection: "row" },
   pane: { paddingHorizontal: space.lg, paddingTop: space.md },
   card: {
     borderRadius: radius.lg,
