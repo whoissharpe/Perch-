@@ -4,6 +4,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { KIND_LABELS, type SpotKind } from "@perch/core";
 import { useTheme, useShadow, type, radius, space } from "@/theme";
 import { curatedNear } from "@/curated";
+import { HOME } from "@/home";
 import { useNearby } from "@/nearby";
 import { SpotCard } from "@/components/SpotCard";
 import { MapCanvas } from "@/components/MapCanvas";
@@ -21,12 +22,6 @@ type Filter = SpotKind | "all" | "picks";
 
 const FILTERS: Filter[] = ["all", "picks", "bench", "viewpoint", "trail_rest"];
 
-/**
- * Centre used until the first location fix lands. Jacksonville, because that
- * is where the first real picks are and an empty-handed first run should still
- * open onto something walkable.
- */
-const FALLBACK = { lat: 30.3322, lng: -81.6557 };
 
 export default function MapScreen() {
   const c = useTheme();
@@ -52,7 +47,7 @@ export default function MapScreen() {
   // rebuild every pin on the map.
   const centre = location
     ? { lat: round(location.lat), lng: round(location.lng) }
-    : FALLBACK;
+    : HOME;
 
   const picks = useMemo(() => curatedNear(centre.lat, centre.lng), [centre.lat, centre.lng]);
 

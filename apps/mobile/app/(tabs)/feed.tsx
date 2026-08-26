@@ -3,18 +3,18 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useTheme, type, space } from "@/theme";
 import { curatedNear } from "@/curated";
+import { HOME } from "@/home";
 import { SpotCard } from "@/components/SpotCard";
 import { Wordmark } from "@/components/Wordmark";
 import { useLiveLocation } from "@/useLiveLocation";
 
-const FALLBACK = { lat: 30.3322, lng: -81.6557 };
 
 export default function FeedScreen() {
   const c = useTheme();
   const insets = useSafeAreaInsets();
   const { location } = useLiveLocation(false);
 
-  const centre = location ?? FALLBACK;
+  const centre = location ?? HOME;
 
   // Nobody you follow has marked anything yet, because nobody exists yet. The
   // feed shows the picks and says so, rather than inventing strangers.

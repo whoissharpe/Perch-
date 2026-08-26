@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import MapView, { Marker, PROVIDER_DEFAULT, type Region } from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import { useTheme } from "@/theme";
+import { HOME } from "@/home";
 import { MAP_STYLE_LIGHT, MAP_STYLE_DARK } from "@/mapStyle";
 import { useScheme } from "@/scheme";
 import { BIRD_ZOOM, PERCH_ZOOM, pinScale } from "@/birdSprites";
@@ -74,8 +75,8 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: Ma
       showsCompass={false}
       showsPointsOfInterest={false}
       initialRegion={{
-        latitude: me?.lat ?? 38.7223,
-        longitude: me?.lng ?? -9.1394,
+        latitude: me?.lat ?? HOME.lat,
+        longitude: me?.lng ?? HOME.lng,
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
       }}

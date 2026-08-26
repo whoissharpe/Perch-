@@ -3,6 +3,7 @@ import maplibregl, { type Map as MapLibreMap, Marker } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { palette } from "@perch/core";
 import { useScheme } from "@/scheme";
+import { HOME } from "@/home";
 import {
   BIRD_ZOOM,
   LANDING,
@@ -79,7 +80,7 @@ export function MapCanvas({ spots, selectedId, onSelect, me, follow, focus }: Ma
     const m = new maplibregl.Map({
       container: host.current,
       style: STYLE,
-      center: [-9.1394, 38.7223],
+      center: [HOME.lng, HOME.lat],
       zoom: 13.4,
       attributionControl: false,
     });
