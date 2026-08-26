@@ -80,10 +80,30 @@ export default function OnboardingScreen() {
   const [index, setIndex] = useState(0);
 
   const progress = useRef(new Animated.Value(0)).current;
-  /** Settled offset, counted in panes rather than pixels. */
-  const slide = useRef(new Animated.Value(0)).current;
-  /** Live finger movement in pixels, added on top of the settled offset. */
-  const drag = useRef(new Animated.Value(0)).current;
+
+  /**
+   * The strip's offset in pixels. One value, one driver.
+   *
+   * This was two values composed with Animated.add: a native-driven slide plus
+   * a JS-driven drag. React Native cannot mix drivers inside one transform —
+   * the composed node ends up half on each side of the bridge — and that is
+   * what was left of the glitch after the scroll container went. A single
+   * value on the JS driver has nothing to desynchronise against, and the drag
+   * writes to the very same value the animation settles.
+   */
+  const x = useRef(new Animated.Value(0)).current;
+  /** Where the strip rests for the current pane, so a drag can start from it. */
+  const restX = useRef(0);
+
+  // Keep the resting offset correct if the window changes width mid-session.
+  const paneWRef = useRef(paneW);
+  useEffect(() => {
+    paneWRef.current = paneW;
+    const at = -indexRef.current * paneW;
+    restX.current = at;
+    x.setValue(at);
+  }, [paneW, x]);
+
 
   const indexRef = useRef(0);
   const settle = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -99,37 +119,43 @@ export default function OnboardingScreen() {
 
   function goTo(i: number) {
     const next = Math.max(0, Math.min(PANES.length - 1, i));
+    const target = -next * paneW;
     indexRef.current = next;
+    restX.current = target;
     setIndex(next);
-    drag.setValue(0);
+
+    let arrived = false;
 
     Animated.parallel([
-      Animated.timing(slide, {
-        toValue: next,
+      Animated.timing(x, {
+        toValue: target,
         duration: SLIDE_MS,
-        easing: Easing.bezier(0.32, 0.72, 0, 1),
-        useNativeDriver: true,
+        easing: Easing.out(Easing.cubic),
+        useNativeDriver: false,
       }),
       Animated.timing(progress, {
         toValue: next,
         duration: SLIDE_MS,
-        // Width cannot be driven natively; this is a 3-step bar, not a
-        // per-frame animation, so the JS driver is the right trade here.
         useNativeDriver: false,
       }),
-    ]).start();
+    ]).start(({ finished }) => {
+      arrived = finished;
+    });
 
-    // Guarantee arrival. Animated.timing only advances while frames are being
-    // drawn, so in a backgrounded or throttled view the strip would sit where
-    // it was and the pane would never change — the same failure that has now
-    // bitten the transition, the camera and this pager. setValue writes the
-    // position directly, so if the animation did run this is a no-op and if it
-    // did not, the pane still arrives.
+    // Arrival without frames. Animated only advances while frames are drawn,
+    // so in a throttled view the pane would never change.
+    //
+    // Crucially this fires *only if the animation did not finish*. Writing the
+    // value unconditionally — which is what it used to do — snapped the strip
+    // the last few pixels on every single transition, on top of an animation
+    // that had worked perfectly well. That was a self-inflicted stutter at the
+    // end of every swipe.
     if (settle.current) clearTimeout(settle.current);
     settle.current = setTimeout(() => {
-      slide.setValue(next);
+      if (arrived) return;
+      x.setValue(target);
       progress.setValue(next);
-    }, SLIDE_MS + 80);
+    }, SLIDE_MS + 120);
   }
 
   // The responder is created once, so it reaches the latest goTo through a ref
@@ -143,25 +169,22 @@ export default function OnboardingScreen() {
       // flick still belongs to the page rather than to the pager.
       onMoveShouldSetPanResponder: (_e, g) =>
         Math.abs(g.dx) > 12 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
-      onPanResponderMove: (_e, g) => drag.setValue(g.dx),
+      onPanResponderMove: (_e, g) => {
+        // Rubber-band past the ends rather than letting the strip run off
+        // into empty space: resistance tells you there is nothing there.
+        const raw = restX.current + g.dx;
+        const min = -(PANES.length - 1) * paneWRef.current;
+        const over = raw > 0 ? raw : raw < min ? raw - min : 0;
+        x.setValue(over === 0 ? raw : raw - over * 0.6);
+      },
       onPanResponderRelease: (_e, g) => {
         // A quick flick counts as much as a long drag.
         const far = Math.abs(g.dx) > 90 || Math.abs(g.vx) > 0.35;
         if (far) goToRef.current(indexRef.current + (g.dx < 0 ? 1 : -1));
-        else
-          Animated.timing(drag, {
-            toValue: 0,
-            duration: 180,
-            useNativeDriver: true,
-          }).start();
+        // Not far enough: fall back to where it started.
+        else goToRef.current(indexRef.current);
       },
-      onPanResponderTerminate: () => {
-        Animated.timing(drag, {
-          toValue: 0,
-          duration: 180,
-          useNativeDriver: true,
-        }).start();
-      },
+      onPanResponderTerminate: () => goToRef.current(indexRef.current),
     }),
   ).current;
 
@@ -170,14 +193,6 @@ export default function OnboardingScreen() {
     // The bird carries you out of the intro and into the map.
     flyTo("/", "replace");
   }
-
-  const stripX = Animated.add(
-    slide.interpolate({
-      inputRange: [0, PANES.length - 1],
-      outputRange: [0, -paneW * (PANES.length - 1)],
-    }),
-    drag,
-  );
 
   return (
     <View style={[styles.fill, { backgroundColor: c.paper }]}>
@@ -213,7 +228,7 @@ export default function OnboardingScreen() {
         <Animated.View
           style={[
             styles.strip,
-            { width: paneW * PANES.length, transform: [{ translateX: stripX }] },
+            { width: paneW * PANES.length, transform: [{ translateX: x }] },
           ]}
         >
           {PANES.map((p) => {
