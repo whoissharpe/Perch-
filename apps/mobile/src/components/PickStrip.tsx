@@ -4,6 +4,7 @@ import { useTheme, useShadow, type, radius, space } from "@/theme";
 import { PerchBadge } from "./PerchBadge";
 import { Mark } from "./Mark";
 import type { SampleMark } from "@/sample";
+import { thumb } from "@/media";
 
 /**
  * A rail of the team's picks along the bottom of the map.
@@ -80,7 +81,7 @@ export function PickStrip({
           >
             <View style={styles.mediaWrap}>
               <Image
-                source={{ uri: p.image }}
+                source={{ uri: thumb(p.image, 208) }}
                 style={styles.media}
                 contentFit="cover"
                 transition={200}

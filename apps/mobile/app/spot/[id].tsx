@@ -7,6 +7,7 @@ import { KIND_LABELS, formatCoords } from "@perch/core";
 import { useTheme, type, radius, space } from "@/theme";
 import { Icon } from "@/components/Icon";
 import { curatedById } from "@/curated";
+import { thumb } from "@/media";
 
 export default function SpotScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
@@ -32,7 +33,7 @@ export default function SpotScreen() {
         showsVerticalScrollIndicator={false}
       >
         <View>
-          <Image source={{ uri: spot.image }} style={styles.hero} contentFit="cover" />
+          <Image source={{ uri: thumb(spot.image, 390) }} style={styles.hero} contentFit="cover" />
           <Pressable
             onPress={() => router.back()}
             style={[styles.back, { top: insets.top + 8 }]}

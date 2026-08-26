@@ -7,6 +7,7 @@ import { Icon } from "./Icon";
 import { PerchBadge } from "./PerchBadge";
 import { Mark } from "./Mark";
 import type { SampleMark } from "@/sample";
+import { thumb } from "@/media";
 
 export function SpotCard({ mark }: { mark: SampleMark }) {
   const c = useTheme();
@@ -28,7 +29,7 @@ export function SpotCard({ mark }: { mark: SampleMark }) {
     >
       <View style={styles.mediaWrap}>
         <Image
-          source={{ uri: mark.image }}
+          source={{ uri: thumb(mark.image, 360) }}
           style={styles.media}
           contentFit="cover"
           transition={220}

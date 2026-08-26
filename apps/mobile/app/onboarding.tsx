@@ -19,6 +19,7 @@ import { Mark } from "@/components/Mark";
 import { useFirstRun } from "@/firstRun";
 import { useTransition } from "@/transition";
 import { PICKS } from "@/curated";
+import { thumb } from "@/media";
 
 /**
  * Three panes, and a way out on every one of them.
@@ -79,7 +80,6 @@ export default function OnboardingScreen() {
   const { width: paneW } = useWindowDimensions();
   const [index, setIndex] = useState(0);
 
-  const progress = useRef(new Animated.Value(0)).current;
 
   /**
    * The strip's offset in pixels. One value, one driver.
@@ -126,19 +126,12 @@ export default function OnboardingScreen() {
 
     let arrived = false;
 
-    Animated.parallel([
-      Animated.timing(x, {
-        toValue: target,
-        duration: SLIDE_MS,
-        easing: Easing.out(Easing.cubic),
-        useNativeDriver: false,
-      }),
-      Animated.timing(progress, {
-        toValue: next,
-        duration: SLIDE_MS,
-        useNativeDriver: false,
-      }),
-    ]).start(({ finished }) => {
+    Animated.timing(x, {
+      toValue: target,
+      duration: SLIDE_MS,
+      easing: Easing.out(Easing.cubic),
+      useNativeDriver: false,
+    }).start(({ finished }) => {
       arrived = finished;
     });
 
@@ -154,7 +147,6 @@ export default function OnboardingScreen() {
     settle.current = setTimeout(() => {
       if (arrived) return;
       x.setValue(target);
-      progress.setValue(next);
     }, SLIDE_MS + 120);
   }
 
@@ -199,19 +191,21 @@ export default function OnboardingScreen() {
       <View style={[styles.top, { paddingTop: insets.top + space.sm }]}>
         <Mark size={26} />
 
-        <View style={[styles.track, { backgroundColor: c.sunk }]}>
-          <Animated.View
-            style={[
-              styles.fillBar,
-              {
-                backgroundColor: c.pine,
-                width: progress.interpolate({
-                  inputRange: [0, PANES.length - 1],
-                  outputRange: ["33%", "100%"],
-                }),
-              },
-            ]}
-          />
+        {/* Discrete segments rather than a growing bar. The fill used to be
+            an animated width percentage, which forces a layout pass on every
+            frame of every transition — the most expensive way there is to
+            move four pixels. Segments change colour instead, which costs
+            nothing, and they match what the bar was always meant to say. */}
+        <View style={styles.track}>
+          {PANES.map((p, i) => (
+            <View
+              key={p.key}
+              style={[
+                styles.seg,
+                { backgroundColor: i <= index ? c.pine : c.sunk },
+              ]}
+            />
+          ))}
         </View>
 
         <Pressable
@@ -250,7 +244,7 @@ export default function OnboardingScreen() {
                   ]}
                 >
                   <Image
-                    source={{ uri: shot.image }}
+                    source={{ uri: thumb(shot.image, 350) }}
                     style={styles.img}
                     contentFit="cover"
                     transition={220}
@@ -297,8 +291,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: space.lg,
     paddingBottom: space.sm,
   },
-  track: { flex: 1, height: 4, borderRadius: 2, overflow: "hidden" },
-  fillBar: { height: "100%", borderRadius: 2 },
+  track: { flex: 1, flexDirection: "row", gap: 4 },
+  seg: { flex: 1, height: 4, borderRadius: 2 },
   skip: { minWidth: 44, minHeight: 44, alignItems: "flex-end", justifyContent: "center" },
   viewport: { flex: 1, overflow: "hidden" },
   strip: { flex: 1, flexDirection: "row" },

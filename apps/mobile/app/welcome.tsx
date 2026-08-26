@@ -8,6 +8,7 @@ import { useTheme, type, space } from "@/theme";
 import { Mark } from "@/components/Mark";
 import { Button } from "@/components/Button";
 import { PICKS } from "@/curated";
+import { thumb } from "@/media";
 
 /**
  * The first screen.
@@ -68,7 +69,7 @@ export default function WelcomeScreen() {
               },
             ]}
           >
-            <Image source={{ uri: p.image }} style={styles.img} contentFit="cover" />
+            <Image source={{ uri: thumb(p.image, 172) }} style={styles.img} contentFit="cover" />
           </View>
         ))}
         {/* Fades the deck into the page so the type below never fights it.
